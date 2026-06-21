@@ -227,7 +227,7 @@ on adjacency lists."
      (let [nbrs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes nbrs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes nbrs disj)))))
 
    :remove-edges*
    (fn [g edges]
@@ -269,8 +269,8 @@ on adjacency lists."
            outs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes ins disj))
-           (assoc :in (remove-adj-nodes (:in g) nodes outs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes ins disj))
+           (assoc :in (remove-adj-nodes (get g :in) nodes outs disj)))))
 
    :remove-edges*
    (fn [g edges]
@@ -288,7 +288,16 @@ on adjacency lists."
   Digraph
   (merge default-digraph-impl
          {:transpose (fn [g]
-                       (assoc g :adj (:in g) :in (:adj g)))}))
+                       ;; Rebuild from reversed edges rather than swapping the
+                       ;; :adj/:in fields. Under ClojureScript, reading those
+                       ;; fields back inside this generated extend-type method
+                       ;; mis-sets :adj to nil; the rebuild form (also used
+                       ;; by the weighted digraph) avoids it and keeps isolated
+                       ;; nodes via the retained :nodeset.
+                       (reduce (fn [tg [n1 n2]]
+                                 (add-edges* tg [[n2 n1]]))
+                               (assoc g :adj {} :in {})
+                               (edges g)))}))
 
 (extend BasicEditableWeightedGraph
   Graph
@@ -316,7 +325,7 @@ on adjacency lists."
      (let [nbrs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes nbrs dissoc)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes nbrs dissoc)))))
 
    :remove-edges*
    (fn [g edges]
@@ -361,8 +370,8 @@ on adjacency lists."
            outs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes ins dissoc))
-           (assoc :in (remove-adj-nodes (:in g) nodes outs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes ins dissoc))
+           (assoc :in (remove-adj-nodes (get g :in) nodes outs disj)))))
 
    :remove-edges*
    (fn [g edges]
