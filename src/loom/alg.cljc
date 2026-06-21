@@ -832,4 +832,74 @@ can use these functions."
                (graph/add-edges* (map (fn [[x y]] [(phi x) (phi y)])
                                       (edges g1))))))
 
+(defn- insert-in-blocked-map
+  "Helper for digraph-all-cycles. When no cycle is found, block curr by
+  recording it against each of its children in bmap."
+  [cycle-data curr children]
+  (reduce (fn [{:keys [bmap] :as acc} child]
+            (if (contains? bmap child)
+              (update-in acc [:bmap child] conj curr)
+              (assoc-in acc [:bmap child] #{curr})))
+          cycle-data children))
+
+(defn- unblock-nodes
+  "Helper for digraph-all-cycles. Unblock curr and, recursively, the nodes
+  blocked on it (tracked in bset/bmap)."
+  [{:keys [bmap] :as cycle-data} curr unblocked]
+  (if (contains? unblocked curr)
+    cycle-data
+    (as-> cycle-data cd
+      (update cd :bset disj curr)
+      (reduce (fn [acc node-to-unblock]
+                (unblock-nodes acc node-to-unblock (conj unblocked curr)))
+              cd (get bmap curr))
+      (update cd :bmap dissoc curr))))
+
+(defn- find-all-cycles
+  "Helper for digraph-all-cycles. Returns all cycles through start reachable
+  from curr along path."
+  [g start curr cycle path rset bset bmap]
+  (as-> {:cycle? cycle
+         :all-cycles []
+         :bset (conj bset curr)
+         :rset rset
+         :bmap bmap} cycle-data
+    (reduce
+     (fn [{:keys [bset rset bmap] :as acc} child]
+       (cond
+         (= child start) (-> acc
+                             (assoc :cycle? true)
+                             (update :all-cycles conj path))
+
+         (or (contains? rset child)
+             (contains? bset child)) acc
+
+         :else
+         (let [new-acc (find-all-cycles g start child false (conj path child)
+                                        rset bset bmap)]
+           (-> new-acc
+               (update :cycle? #(or %1 %2) (:cycle? acc))
+               (update :all-cycles concat (:all-cycles acc))))))
+     cycle-data (successors g curr))
+    (if (:cycle? cycle-data)
+      ;; the empty unblocked set keeps unblock-nodes from looping forever
+      (unblock-nodes cycle-data curr #{})
+      (insert-in-blocked-map cycle-data curr (successors g curr)))))
+
+(defn digraph-all-cycles
+  "Returns all simple cycles in a directed graph, each as a vector of nodes.
+  Returns ::not-a-directed-graph if g is undirected. Implements Johnson's
+  algorithm (https://www.cs.tufts.edu/comp/150GA/homeworks/hw1/Johnson%2075.PDF)."
+  [g]
+  (if (directed? g)
+    (as-> {:ans [] :rset #{}} cycle-data
+      (reduce (fn [{:keys [ans rset]} curr]
+                (let [{:keys [all-cycles rset]}
+                      (find-all-cycles g curr curr false [curr] rset #{} {})]
+                  {:ans (concat ans all-cycles)
+                   :rset (conj rset curr)}))
+              cycle-data (nodes g))
+      (:ans cycle-data))
+    ::not-a-directed-graph))
+
 ;; ;; Todo: MST, coloring, matching, etc etc

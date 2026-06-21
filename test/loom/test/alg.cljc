@@ -13,7 +13,7 @@
                               coloring? greedy-coloring prim-mst-edges
                               prim-mst-edges prim-mst astar-path astar-dist
                               degeneracy-ordering maximal-cliques simple-paths
-                              subgraph? eql? isomorphism?]]
+                              subgraph? eql? isomorphism? digraph-all-cycles]]
             [loom.derived :refer [mapped-by]]
             clojure.walk
             #?@(:clj [[clojure.test :refer :all]]
@@ -189,6 +189,27 @@
                                [:e :f 1]
                                :g :h
                              ))
+
+(def directed-graph1 (digraph [1 2] [2 3] [2 4] [3 1] [4 3]))
+
+(def directed-graph2 (digraph {1 [2 5 8]
+                               2 [3 7 9]
+                               3 [1 2 4 6]
+                               4 [5]
+                               5 [2]
+                               6 [4]
+                               8 [9]
+                               9 [8]}))
+
+(def directed-graph3 (digraph [1 2] [1 5] [2 4] [2 5] [2 7] [3 2] [3 7]
+                              [4 1] [4 3] [4 7] [5 6] [5 7] [6 1] [6 2]
+                              [6 4] [7 1]))
+
+;; No cycles present here
+(def directed-graph4 (digraph {1 [2 3]
+                               2 [4 5]
+                               3 [4 5]
+                               6 [1]}))
 
 (deftest depth-first-test
   (are [expected got] (= expected got)
@@ -663,3 +684,23 @@
     false (isomorphism? g7 (mapped-by inc g7) dec)
     false (isomorphism? (digraph) (graph) identity)
     false(isomorphism? (digraph [1 2]) (graph [1 2]) identity)))
+
+(deftest digraph-all-cycles-test
+  (testing "simple cycles in directed graphs"
+    (is (= (sort (map (comp vec sort) (digraph-all-cycles directed-graph1)))
+           (sort (map (comp vec sort) [[1 2 3] [1 2 4 3]]))))
+    (is (= (sort (map (comp vec sort) (digraph-all-cycles directed-graph2)))
+           (sort (map (comp vec sort) [[1 5 2 3] [1 2 3] [4 5 2 3 6]
+                                       [4 5 2 3] [3 2] [9 8]]))))
+    (is (= (sort (map (comp vec sort) (digraph-all-cycles directed-graph3)))
+           (sort (map (comp vec sort) [[7 1 5 6 2 4 3] [7 1 5 6 2 4] [7 1 5 6 2]
+                                       [7 1 5 6 4 3 2] [7 1 5 6 4 3] [7 1 5 6 4]
+                                       [7 1 5] [7 1 2 5 6 4 3] [7 1 2 5 6 4]
+                                       [7 1 2 5] [7 1 2 4 3] [7 1 2 4] [7 1 2]
+                                       [1 5 6 2 4] [1 5 6 4] [1 5 6] [1 2 5 6 4]
+                                       [1 2 5 6] [1 2 4] [4 3 2 5 6] [4 3 2]
+                                       [6 2 5]])))))
+  (testing "no cycles present"
+    (is (= (digraph-all-cycles directed-graph4) '())))
+  (testing "not a directed graph"
+    (is (= (digraph-all-cycles g6) :loom.alg/not-a-directed-graph))))
