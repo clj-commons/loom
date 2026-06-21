@@ -93,13 +93,28 @@
               (anc-model-anc? anc-model a b))))
         samp-pairs)))))
 
-(defspec ^:test-check-fast dag-similarity-100
-  100
-  dag-similarity-props)
+;; test.check's generator runtime does not survive the test build's :advanced
+;; ClojureScript compilation, so the property-based specs run under Clojure only.
+;; loom's ancestry code itself is exercised in ClojureScript by ancestry-test.
+#?(:clj
+   (defspec ^:test-check-fast dag-similarity-100
+     100
+     dag-similarity-props))
 
-(defspec ^:test-check-slow dag-similarity-2000
-  2000
-  dag-similarity-props)
+#?(:clj
+   (defspec ^:test-check-slow dag-similarity-2000
+     2000
+     dag-similarity-props))
+
+(deftest ancestry-test
+  (let [a (-> (lag/ancestry-new)
+              (lag/ancestry-add 0)
+              (lag/ancestry-add 1 0)
+              (lag/ancestry-add 2 1)
+              (lag/ancestry-add 40 2))]
+    (is (lag/ancestor? a 40 0))
+    (is (not (lag/ancestor? a 0 40)))
+    (is (= [0 1 2] (sort (lag/ancestors a 40))))))
 
 (def g1
   {:a [:b :c]
