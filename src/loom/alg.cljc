@@ -283,6 +283,48 @@ can use these functions."
       [start]
       (bf-traverse g start :f vector)))))
 
+(defn simple-paths
+  "Finds all simple paths from start node to end node. Paths are represented as
+  a collection of nodes in traversal order. With :max-depth, only returns paths
+  with fewer than max-depth nodes."
+  [g start end & {:keys [max-depth] :or {max-depth nil}}]
+  (if (= start end)
+    [[start]]
+    (letfn [(create-path-map []
+              {:members #{}
+               :path []})
+            (add-path-node [pm n]
+              (-> pm
+                  (update :members conj n)
+                  (update :path conj n)))]
+      (loop [q #?(:clj clojure.lang.PersistentQueue/EMPTY
+                  :cljs cljs.core/PersistentQueue.EMPTY)
+             completed-paths []
+             p (-> (create-path-map)
+                   (add-path-node start))]
+        (let [p-last (-> p :path peek)
+              unseen-succs (filter (comp not (:members p)) (successors g p-last))
+              succ-ps (map (partial add-path-node p) unseen-succs)
+              updated-q (reduce conj q (filter (fn [succ-p]
+                                                 ;; keep extending paths that have
+                                                 ;; not yet reached end and are
+                                                 ;; under max-depth (when given)
+                                                 (and (-> succ-p :path peek (= end) not)
+                                                      (if (nil? max-depth)
+                                                        true
+                                                        (-> succ-p :path count (< max-depth)))))
+                                               succ-ps))
+              updated-completed-paths (reduce conj
+                                              completed-paths
+                                              (->> succ-ps
+                                                   (filter (comp (partial = end) peek :path))
+                                                   (map :path)))]
+          (if (-> updated-q empty? not)
+            (recur (pop updated-q)
+                   updated-completed-paths
+                   (peek updated-q))
+            updated-completed-paths))))))
+
 (defn- bellman-ford-transform
   "Helper function for Johnson's algorithm. Uses Bellman-Ford to remove negative weights."
   [wg]
