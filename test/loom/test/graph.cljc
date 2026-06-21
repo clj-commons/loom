@@ -39,6 +39,14 @@
              false (has-node? g1 5)
              false (has-edge? g1 4 1)))))
 
+(deftest empty-map-construction-test
+  ;; Building from an empty adjacency map must give an empty graph, not throw.
+  (are [g] (and (empty? (nodes g)) (empty? (edges g)))
+    (graph {})
+    (digraph {})
+    (weighted-graph {})
+    (weighted-digraph {})))
+
 (deftest simple-graph-test
   (let [g1 (graph [1 2] [1 3] [2 3] 4)
         g2 (graph {1 [2 3] 2 [3] 4 []})

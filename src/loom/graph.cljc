@@ -506,7 +506,7 @@ on adjacency lists."
                    (assoc :attrs (merge (:attrs g) (:attrs init)))))
              ;; adacency map
              (map? init)
-             (let [es (if (map? (val (first init)))
+             (let [es (if (and (seq init) (map? (val (first init))))
                         (for [[n nbrs] init
                               [nbr wt] nbrs]
                           [n nbr wt])
