@@ -582,6 +582,12 @@
        #{#{:a :b :c} #{:b :d :e} #{:e :f}}
        (set (maximal-cliques maximal-cliques-g2))))
 
+(deftest maximal-cliques-digraph-throws
+  ;; Bron-Kerbosch is undirected-only; a digraph must throw rather than
+  ;; return wrong results.
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (maximal-cliques (digraph [:a :b] [:b :c])))))
+
 
 (def subgraph-g6 (graph [0 1] [1 2] [1 3]))
 (def subgraph-g7 (digraph [1 2] [2 3] [3 1]))
