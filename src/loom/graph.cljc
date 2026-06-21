@@ -465,6 +465,16 @@ on adjacency lists."
   [g]
   (satisfies? Digraph g))
 
+(defn neighbors
+  "Returns all nodes adjacent to node, ignoring edge direction. For an
+  undirected graph this is just the successors; for a digraph it is the union
+  of predecessors and successors."
+  ([g] #(neighbors g %))
+  ([g node]
+   (if (directed? g)
+     (into (set (predecessors g node)) (successors g node))
+     (successors g node))))
+
 (defn weighted?
   "Returns true if g satisfies the WeightedGraph protocol"
   [g]

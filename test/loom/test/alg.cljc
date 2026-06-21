@@ -426,6 +426,16 @@
     #{#{#{2 3 4 5} #{1 6 7 8}}
       #{#{2 3 4 6 7 8} #{1 5}}} (set (bipartite-sets g8))))
 
+(deftest bipartite-color-digraph-sinks-test
+  ;; A 4-cycle as a digraph with sink nodes 1 and 3 (no outgoing edges). Its
+  ;; undirected projection is bipartite, so coloring must follow predecessor
+  ;; edges as well as successors and return a coloring, not nil.
+  (let [di (digraph [2 1] [2 3] [4 3] [4 1])
+        coloring (bipartite-color di)]
+    (is (some? coloring))
+    (is (every? (fn [[u v]] (not= (coloring u) (coloring v))) (edges di)))
+    (is (true? (bipartite? di)))))
+
 (deftest coloring?-test
   (are [expected got] (= expected got)
        true (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 2, 6 1})
