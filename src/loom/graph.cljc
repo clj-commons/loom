@@ -82,7 +82,7 @@ on adjacency lists."
 (defn weight
  "Returns the weight of edge e or edge [n1 n2]"
   ([g] (partial weight g))
-  ([g e] (weight* g (src e) (dest e)))
+  ([g e] (weight* g e))
   ([g n1 n2] (weight* g n1 n2)))
 
 ;; Variadic wrappers

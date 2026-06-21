@@ -39,6 +39,16 @@
              false (has-node? g1 5)
              false (has-edge? g1 4 1)))))
 
+(deftest weight-edge-arity-test
+  ;; weight on an edge must dispatch to (weight* g e), not (weight* g src dest);
+  ;; the two differ for graphs where an edge is not determined by its endpoints
+  ;; (e.g. multigraphs).
+  (let [g (reify WeightedGraph
+            (weight* [_ _e] :edge-arity)
+            (weight* [_ _n1 _n2] :node-arity))]
+    (is (= :edge-arity (weight g [1 2])))
+    (is (= :node-arity (weight g 1 2)))))
+
 (deftest empty-map-construction-test
   ;; Building from an empty adjacency map must give an empty graph, not throw.
   (are [g] (and (empty? (nodes g)) (empty? (edges g)))
