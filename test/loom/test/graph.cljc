@@ -1,6 +1,7 @@
 (ns loom.test.graph
   (:require [loom.graph :refer (graph digraph weighted-graph weighted-digraph
                                       nodes edges has-node? has-edge? transpose fly-graph
+                                      remove-nodes
                                       weight graph? Graph directed? Digraph weighted?
                                       WeightedGraph subgraph add-path add-cycle)]
             [loom.attr :as attr]
@@ -38,6 +39,22 @@
              true (has-edge? g1 1 2)
              false (has-node? g1 5)
              false (has-edge? g1 4 1)))))
+
+(deftest remove-nodes-prunes-attrs-test
+  ;; remove-nodes must also drop attribute entries for the removed node and
+  ;; edge attributes on other nodes that referenced it.
+  (testing "node and outgoing-edge attrs under the removed node"
+    (let [g (-> (digraph {:a [:b]})
+                (attr/add-attr :a :color :red)
+                (attr/add-attr [:a :b] :foo :bar)
+                (remove-nodes :a))]
+      (is (nil? (get-in g [:attrs :a])))))
+  (testing "back-reference edge attr stored on the surviving neighbor"
+    (let [g (-> (graph {:a [:b]})
+                (attr/add-attr [:a :b] :foo :bar)
+                (remove-nodes :a))]
+      (is (nil? (get-in g [:attrs :a])))
+      (is (empty? (attr/attrs g :b :a))))))
 
 (deftest weight-edge-arity-test
   ;; weight on an edge must dispatch to (weight* g e), not (weight* g src dest);

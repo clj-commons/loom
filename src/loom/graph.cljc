@@ -99,10 +99,32 @@ on adjacency lists."
   [g & edges]
   (add-edges* g edges))
 
+(defn- prune-attrs
+  "Drop attribute entries for removed nodes: their own node/edge attrs, plus
+  back-reference edge attrs that surviving nodes hold toward them. The
+  ::loom.attr/edge-attrs key is named as a literal to avoid a cyclic require."
+  [attrs removed]
+  (let [removed (set removed)]
+    (persistent!
+     (reduce-kv
+      (fn [m node amap]
+        (if (removed node)
+          m
+          (let [ea (get amap :loom.attr/edge-attrs)
+                ea (when ea (apply dissoc ea removed))]
+            (assoc! m node (if (seq ea)
+                             (assoc amap :loom.attr/edge-attrs ea)
+                             (dissoc amap :loom.attr/edge-attrs))))))
+      (transient {})
+      attrs))))
+
 (defn remove-nodes
   "Removes nodes from graph g"
   [g & nodes]
-  (remove-nodes* g nodes))
+  (let [g (remove-nodes* g nodes)]
+    (if (:attrs g)
+      (assoc g :attrs (prune-attrs (:attrs g) nodes))
+      g)))
 
 (defn remove-edges
   "Removes edges from graph g. Do not include weights"
