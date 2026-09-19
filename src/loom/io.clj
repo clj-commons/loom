@@ -14,6 +14,19 @@
   [s]
   (escape s {\" "\\\"" \newline "\\n"}))
 
+(defn- dot-esc-literal
+  "Like dot-esc, but also escapes backslashes. For text printed by Clojure,
+  where a backslash is part of the value and not a Graphviz escape."
+  [s]
+  (dot-esc (escape s {\\ "\\\\"})))
+
+(defn- dot-attr-value
+  [v]
+  (cond
+    (keyword? v) (dot-esc (name v))
+    (string? v) (dot-esc v)
+    :else (dot-esc-literal (str v))))
+
 (defn- dot-attrs
   [attrs]
   (when (seq attrs)
@@ -26,7 +39,7 @@
             (.append \")
             (.append (dot-esc (if (keyword? k) (name k) (str k))))
             (.append "\"=\"")
-            (.append (dot-esc (if (keyword? v) (name v) (str v))))
+            (.append (dot-attr-value v))
             (.append \"))))
       (.append sb "]")
       (str sb))))
