@@ -15,13 +15,13 @@ Watch the talk on Loom [at Clojure/West 2014](https://www.youtube.com/watch?v=wE
 [![Clojars Project](http://clojars.org/aysylu/loom/latest-version.svg)](http://clojars.org/aysylu/loom)
 
 ```clojure
-[aysylu/loom "1.1.0"]
+[aysylu/loom "1.2.0"]
 ```
 
 ### tools.deps / clojure CLI
 
 ```clojure
-aysylu/loom {:mvn/version "1.1.0"}
+aysylu/loom {:mvn/version "1.2.0"}
 ```
 
 ### Namespaces

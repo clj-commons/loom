@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.2.0](https://github.com/clj-commons/loom/tree/1.2.0) (2026-09-19)
+
+**Added:**
+
+- `loom.alg/simple-paths`: all simple paths between two nodes, with an optional `:max-depth`
+- `loom.alg/digraph-all-cycles`: all simple cycles in a directed graph (Johnson's algorithm)
+
+**Performance:**
+
+- `degeneracy-ordering` decrements neighbor degrees directly instead of building an intermediate map
+- `pre-traverse` pushes successors lazily, avoiding O(E) stack growth on dense graphs (preorder unchanged)
+
 ## [1.1.0](https://github.com/clj-commons/loom/tree/1.1.0) (2026-09-19)
 
 **Platform:**
