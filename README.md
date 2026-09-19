@@ -27,13 +27,13 @@ Watch the Loom talk [at Clojure/West 2014](https://www.youtube.com/watch?v=wEEut
 deps.edn:
 
 ```clojure
-aysylu/loom {:mvn/version "1.1.0"}
+aysylu/loom {:mvn/version "1.2.0"}
 ```
 
 Leiningen:
 
 ```clojure
-[aysylu/loom "1.1.0"]
+[aysylu/loom "1.2.0"]
 ```
 
 ### Namespaces
