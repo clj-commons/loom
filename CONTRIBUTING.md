@@ -33,7 +33,8 @@ Code in `.cljc` files runs on both Clojure and ClojureScript. Keep it portable.
 
 ## Commits and pull requests
 
-- Write the commit subject in the imperative mood, under about 72 characters.
+- Follow [the seven rules of a great Git commit message](https://chris.beams.io/posts/git-commit/#seven-rules):
+  an imperative subject under about 72 characters, then a body that explains why.
   [Conventional Commits](https://www.conventionalcommits.org/) are welcome
   (`fix:`, `feat:`, `docs:`, `test:`).
 - Update `CHANGELOG.md` when your change is user-visible.
