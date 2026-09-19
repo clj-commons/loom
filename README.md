@@ -1,4 +1,4 @@
-![Loom logo](https://raw.github.com/aysylu/loom/master/doc/loom_logo.png "Loom")
+![Loom logo](https://raw.githubusercontent.com/clj-commons/loom/master/doc/loom_logo.png "Loom")
 
 [![test](https://github.com/clj-commons/loom/actions/workflows/test.yml/badge.svg)](https://github.com/clj-commons/loom/actions/workflows/test.yml)
 [![cljdoc badge](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
@@ -121,7 +121,7 @@ Pathfinding:
 (bf-path g 1 4)
 => (1 2 3 4)
 
-(bf-path-bi g 1 4) ;bidirectional, parallel
+(bf-path-bi g 1 4) ;bidirectional
 => (1 2 3 4)
 
 (dijkstra-path wg :a :d)
@@ -129,6 +129,18 @@ Pathfinding:
 
 (dijkstra-path-dist wg :a :d)
 => [(:a :b :e :d) 20]
+```
+Paths and cycles:
+```clojure
+(def d (digraph [1 2] [2 3] [1 3] [3 1]))
+
+; All simple paths between two nodes
+(simple-paths d 1 3)
+=> [[1 3] [1 2 3]]
+
+; All simple cycles in a directed graph (Johnson's algorithm)
+(digraph-all-cycles d)
+=> ([1 2 3] [1 3])
 ```
 Other stuff:
 ```clojure
@@ -204,7 +216,7 @@ Derived graphs:
 ```
 ## Dependencies
 
-Nothing but Clojure. There is optional support for visualization via [GraphViz](http://graphviz.org).
+Clojure, [data.priority-map](https://github.com/clojure/data.priority-map) and [cljs-priority-map](https://github.com/tailrecursion/cljs-priority-map). There is optional support for visualization via [GraphViz](http://graphviz.org).
 
 ## TODO
 
