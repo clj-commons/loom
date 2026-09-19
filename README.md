@@ -1,27 +1,39 @@
-![Loom logo](https://raw.github.com/aysylu/loom/master/doc/loom_logo.png "Loom")
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="doc/loom-logo-dark.png">
+  <img src="doc/loom-logo-light.png" alt="Loom" width="240">
+</picture>
 
+[![Clojars Project](https://img.shields.io/clojars/v/aysylu/loom.svg)](https://clojars.org/aysylu/loom)
+[![cljdoc](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
 [![test](https://github.com/clj-commons/loom/actions/workflows/test.yml/badge.svg)](https://github.com/clj-commons/loom/actions/workflows/test.yml)
-[![cljdoc badge](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
+
+Graph library for Clojure and ClojureScript. Build graphs, digraphs, and weighted graphs, run graph algorithms on them, generate random graphs, and read or write graphs in external formats.
+
+## Stack
+
+<a href="https://clojure.org"><img src="https://img.shields.io/badge/Clojure-5881D8?style=flat&logo=clojure&logoColor=fff" alt="Clojure" /></a>
+<a href="https://clojurescript.org"><img src="https://img.shields.io/badge/ClojureScript-5881D8?style=flat&logo=clojure&logoColor=fff" alt="ClojureScript" /></a>
+<a href="https://leiningen.org"><img src="https://img.shields.io/badge/Leiningen-5881D8?style=flat&logo=clojure&logoColor=fff" alt="Leiningen" /></a>
+<a href="https://clojure.org/guides/deps_and_cli"><img src="https://img.shields.io/badge/deps.edn-5881D8?style=flat&logo=clojure&logoColor=fff" alt="deps.edn" /></a>
 
 ## Video and Slides
 
-Watch the talk on Loom [at Clojure/West 2014](https://www.youtube.com/watch?v=wEEutxTYQQU) and view [slides](http://www.slideshare.net/aysylu/loom-at-clojurewest-32794616). Also, there's a video of the talk at [LispNYC](http://youtu.be/Iev7zavblqg) and [slides](http://www.slideshare.net/aysylu/aysylu-loom).
-
+Watch the Loom talk [at Clojure/West 2014](https://www.youtube.com/watch?v=wEEutxTYQQU) and view the [slides](http://www.slideshare.net/aysylu/loom-at-clojurewest-32794616). There is also a talk at [LispNYC](http://youtu.be/Iev7zavblqg) with [slides](http://www.slideshare.net/aysylu/aysylu-loom).
 
 ## Usage
 
-### Leiningen/Clojars [group-id/name version]
+### Install
 
-[![Clojars Project](http://clojars.org/aysylu/loom/latest-version.svg)](http://clojars.org/aysylu/loom)
-
-```clojure
-[aysylu/loom "1.1.0"]
-```
-
-### tools.deps / clojure CLI
+deps.edn:
 
 ```clojure
 aysylu/loom {:mvn/version "1.1.0"}
+```
+
+Leiningen:
+
+```clojure
+[aysylu/loom "1.1.0"]
 ```
 
 ### Namespaces
@@ -37,8 +49,6 @@ aysylu/loom {:mvn/version "1.1.0"}
 ### Documentation
 
 [API Reference](https://cljdoc.org/d/aysylu/loom/CURRENT)
-
-[Frequently Asked Questions](http://aysy.lu/loom/faq.html)
 
 Feel free to join [Loom mailing list](https://groups.google.com/forum/#!forum/loom-clj) and ask any questions you may have.
 
@@ -121,7 +131,7 @@ Pathfinding:
 (bf-path g 1 4)
 => (1 2 3 4)
 
-(bf-path-bi g 1 4) ;bidirectional, parallel
+(bf-path-bi g 1 4) ;bidirectional
 => (1 2 3 4)
 
 (dijkstra-path wg :a :d)
@@ -204,11 +214,11 @@ Derived graphs:
 ```
 ## Dependencies
 
-Nothing but Clojure. There is optional support for visualization via [GraphViz](http://graphviz.org).
+Clojure, [data.priority-map](https://github.com/clojure/data.priority-map) and [cljs-priority-map](https://github.com/tailrecursion/cljs-priority-map). There is optional support for visualization via [GraphViz](http://graphviz.org).
 
 ## TODO
 
-See [Loom TODO board](https://trello.com/b/VgPZkvjP/loom-todo).
+See the [open issues](https://github.com/clj-commons/loom/issues).
 
 ## Testing
 
@@ -226,6 +236,7 @@ Names in no particular order:
 * [Aysylu Greenberg] (https://github.com/aysylu), [aysylu [dot] greenberg [at] gmail [dot] com](mailto:aysylu.greenberg@gmail.com), [@aysylu22](http://twitter.com/aysylu22)
 * [Robert Lachlan](https://github.com/heffalump), [robertlachlan@gmail.com](mailto:robertlachlan@gmail.com)
 * [Stephen Kockentiedt](https://github.com/s-k)
+* [Savyasachi](https://github.com/jsavyasachi)
 
 ## Namespaces
 
