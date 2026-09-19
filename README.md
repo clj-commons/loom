@@ -215,7 +215,7 @@ Clojure, [data.priority-map](https://github.com/clojure/data.priority-map) and [
 
 ## TODO
 
-See [Loom TODO board](https://trello.com/b/VgPZkvjP/loom-todo).
+See the [open issues](https://github.com/clj-commons/loom/issues).
 
 ## Testing
 
@@ -233,6 +233,7 @@ Names in no particular order:
 * [Aysylu Greenberg] (https://github.com/aysylu), [aysylu [dot] greenberg [at] gmail [dot] com](mailto:aysylu.greenberg@gmail.com), [@aysylu22](http://twitter.com/aysylu22)
 * [Robert Lachlan](https://github.com/heffalump), [robertlachlan@gmail.com](mailto:robertlachlan@gmail.com)
 * [Stephen Kockentiedt](https://github.com/s-k)
+* [Savyasachi](https://github.com/jsavyasachi)
 
 ## Namespaces
 
