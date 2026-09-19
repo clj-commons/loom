@@ -1,5 +1,38 @@
 # Change Log
 
+## [1.1.0](https://github.com/clj-commons/loom/tree/1.1.0) (2026-09-19)
+
+**Platform:**
+
+- Clojure 1.12 (default); test matrix spans Clojure 1.10/1.11/1.12 and JDK 8/11/17/21
+- data.priority-map 0.0.10 -> 1.2.1
+- test.check 0.9.0 -> 1.1.3
+- ClojureScript 1.10.520 -> 1.12.145 (dev dependency; CI runs the Clojure suite only, ClojureScript CI comes in a later release)
+- deps.edn added for tools.deps / clojure CLI users
+- GitHub Actions CI (replaces Travis CI)
+
+**Added:**
+
+- `loom.graph/neighbors`: adjacent nodes ignoring edge direction (predecessors and successors for a digraph)
+
+**Behavior changes:**
+
+- `maximal-cliques` on a digraph now throws `ex-info` instead of returning wrong results
+- `weight` on an edge now calls `(weight* g e)`. A custom `WeightedGraph` that implements only the three-argument `weight*` needs to add the edge arity
+- `remove-nodes` now also removes the node and edge attributes of the removed nodes
+
+**Bug fixes:**
+
+- transpose returned empty graph under ClojureScript, cascading to scc/strongly-connected? (#131)
+- remove-nodes and subgraph threw null errors under ClojureScript, caused by direct keyword access on graphs (#134)
+- bf-path-bi had a data race in concurrent BFS frontiers, could return non-shortest paths; now deterministic
+- bipartite-color ignored edge direction on digraphs, producing non-deterministic and incorrect results (#118)
+- maximal-cliques on a digraph silently returned incorrect results; now throws ex-info (#128)
+- remove-nodes left removed node attributes in the graph (#93)
+- weight on an edge did not dispatch through the weight* protocol (#141)
+- build-graph from empty adjacency map threw NPE (#137)
+- clojure.core/abs exclusion added to loom.network-simplex for Clojure 1.11 compatibility
+
 ## [1.0.1](https://github.com/aysylu/loom/tree/1.0.1) (2018-02-19)
 [Full Changelog](https://github.com/aysylu/loom/compare/1.0.0...1.0.1)
 

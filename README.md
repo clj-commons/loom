@@ -1,9 +1,7 @@
 ![Loom logo](https://raw.github.com/aysylu/loom/master/doc/loom_logo.png "Loom")
 
-[![Build Status](https://travis-ci.org/aysylu/loom.png)](http://travis-ci.org/aysylu/loom)
+[![test](https://github.com/clj-commons/loom/actions/workflows/test.yml/badge.svg)](https://github.com/clj-commons/loom/actions/workflows/test.yml)
 [![cljdoc badge](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
-
-**IMPORTANT: This repository is no longer actively maintained ([announcement](https://groups.google.com/g/clojure/c/ng4azryzCfs/m/148yAoP4DgAJ)).**
 
 ## Video and Slides
 
@@ -215,7 +213,9 @@ See [Loom TODO board](https://trello.com/b/VgPZkvjP/loom-todo).
 ## Testing
 
 ```bash
-lein test-all
+lein test          # default suite
+lein test :all     # includes the slow generative specs
+lein all test      # Clojure 1.10, 1.11 and 1.12
 ```
 
 ## Contributors
