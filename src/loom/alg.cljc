@@ -285,7 +285,8 @@ can use these functions."
 
 (defn simple-paths
   "Finds all simple paths from start node to end node. Paths are represented as
-  a collection of nodes in traversal order."
+  a collection of nodes in traversal order. With :max-depth, only returns paths
+  with at most max-depth nodes."
   [g start end & {:keys [max-depth] :or {max-depth nil}}]
   (if (= start end)
     [[start]]
