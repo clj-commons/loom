@@ -1,4 +1,4 @@
-(defproject aysylu/loom "1.0.3-SNAPSHOT"
+(defproject aysylu/loom "1.1.0"
   :min-lein-version "2.0.0"
   :description "Graph library for Clojure"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,11 @@
   :dependencies [[org.clojure/clojure "1.12.0" :scope "provided"]
                  [org.clojure/data.priority-map "1.2.1"]
                  [tailrecursion/cljs-priority-map "1.2.1"]]
-  :url "https://github.com/jsavyasachi/loom"
+  :url "https://github.com/clj-commons/loom"
+  :scm {:name "git"
+        :url "https://github.com/clj-commons/loom"
+        :connection "scm:git:git://github.com/clj-commons/loom.git"
+        :developerConnection "scm:git:ssh://git@github.com/clj-commons/loom.git"}
   :test-selectors {:default (fn [m] (not (:test-check-slow m)))
                    :all (constantly true)
                    :test-check-slow :test-check-slow}

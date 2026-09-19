@@ -9,11 +9,22 @@
 
 Watch the talk on Loom [at Clojure/West 2014](https://www.youtube.com/watch?v=wEEutxTYQQU) and view [slides](http://www.slideshare.net/aysylu/loom-at-clojurewest-32794616). Also, there's a video of the talk at [LispNYC](http://youtu.be/Iev7zavblqg) and [slides](http://www.slideshare.net/aysylu/aysylu-loom).
 
+
 ## Usage
 
 ### Leiningen/Clojars [group-id/name version]
 
 [![Clojars Project](http://clojars.org/aysylu/loom/latest-version.svg)](http://clojars.org/aysylu/loom)
+
+```clojure
+[aysylu/loom "1.1.0"]
+```
+
+### tools.deps / clojure CLI
+
+```clojure
+aysylu/loom {:mvn/version "1.1.0"}
+```
 
 ### Namespaces
 

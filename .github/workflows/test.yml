@@ -27,6 +27,6 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: m2-${{ hashFiles('project.clj') }}
-          restore-keys: m2-
+          key: m2-${{ matrix.jdk }}-${{ matrix.clojure }}-${{ hashFiles('project.clj') }}
+          restore-keys: m2-${{ matrix.jdk }}-${{ matrix.clojure }}-
       - run: lein with-profile +${{ matrix.clojure }} test
