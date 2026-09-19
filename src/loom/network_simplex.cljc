@@ -1,6 +1,7 @@
 (ns ^{:doc "Network simplex algorithm for solving network flow"
       :author "Daniel Hopkins"}
   loom.network-simplex
+  (:refer-clojure :exclude [abs])
   (:require
    [loom.attr
     :refer [add-attr

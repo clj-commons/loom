@@ -1,19 +1,28 @@
 ![Loom logo](https://raw.github.com/aysylu/loom/master/doc/loom_logo.png "Loom")
 
-[![Build Status](https://travis-ci.org/aysylu/loom.png)](http://travis-ci.org/aysylu/loom)
+[![test](https://github.com/clj-commons/loom/actions/workflows/test.yml/badge.svg)](https://github.com/clj-commons/loom/actions/workflows/test.yml)
 [![cljdoc badge](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
-
-**IMPORTANT: This repository is no longer actively maintained ([announcement](https://groups.google.com/g/clojure/c/ng4azryzCfs/m/148yAoP4DgAJ)).**
 
 ## Video and Slides
 
 Watch the talk on Loom [at Clojure/West 2014](https://www.youtube.com/watch?v=wEEutxTYQQU) and view [slides](http://www.slideshare.net/aysylu/loom-at-clojurewest-32794616). Also, there's a video of the talk at [LispNYC](http://youtu.be/Iev7zavblqg) and [slides](http://www.slideshare.net/aysylu/aysylu-loom).
+
 
 ## Usage
 
 ### Leiningen/Clojars [group-id/name version]
 
 [![Clojars Project](http://clojars.org/aysylu/loom/latest-version.svg)](http://clojars.org/aysylu/loom)
+
+```clojure
+[aysylu/loom "1.1.0"]
+```
+
+### tools.deps / clojure CLI
+
+```clojure
+aysylu/loom {:mvn/version "1.1.0"}
+```
 
 ### Namespaces
 
@@ -204,7 +213,9 @@ See [Loom TODO board](https://trello.com/b/VgPZkvjP/loom-todo).
 ## Testing
 
 ```bash
-lein test-all
+lein test          # default suite
+lein test :all     # includes the slow generative specs
+lein all test      # Clojure 1.10, 1.11 and 1.12
 ```
 
 ## Contributors

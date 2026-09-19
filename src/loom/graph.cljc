@@ -82,7 +82,7 @@ on adjacency lists."
 (defn weight
  "Returns the weight of edge e or edge [n1 n2]"
   ([g] (partial weight g))
-  ([g e] (weight* g (src e) (dest e)))
+  ([g e] (weight* g e))
   ([g n1 n2] (weight* g n1 n2)))
 
 ;; Variadic wrappers
@@ -99,10 +99,32 @@ on adjacency lists."
   [g & edges]
   (add-edges* g edges))
 
+(defn- prune-attrs
+  "Drop attribute entries for removed nodes: their own node/edge attrs, plus
+  back-reference edge attrs that surviving nodes hold toward them. The
+  ::loom.attr/edge-attrs key is named as a literal to avoid a cyclic require."
+  [attrs removed]
+  (let [removed (set removed)]
+    (persistent!
+     (reduce-kv
+      (fn [m node amap]
+        (if (removed node)
+          m
+          (let [ea (get amap :loom.attr/edge-attrs)
+                ea (when ea (apply dissoc ea removed))]
+            (assoc! m node (if (seq ea)
+                             (assoc amap :loom.attr/edge-attrs ea)
+                             (dissoc amap :loom.attr/edge-attrs))))))
+      (transient {})
+      attrs))))
+
 (defn remove-nodes
   "Removes nodes from graph g"
   [g & nodes]
-  (remove-nodes* g nodes))
+  (let [g (remove-nodes* g nodes)]
+    (if (:attrs g)
+      (assoc g :attrs (prune-attrs (:attrs g) nodes))
+      g)))
 
 (defn remove-edges
   "Removes edges from graph g. Do not include weights"
@@ -205,7 +227,7 @@ on adjacency lists."
      (let [nbrs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes nbrs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes nbrs disj)))))
 
    :remove-edges*
    (fn [g edges]
@@ -247,8 +269,8 @@ on adjacency lists."
            outs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes ins disj))
-           (assoc :in (remove-adj-nodes (:in g) nodes outs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes ins disj))
+           (assoc :in (remove-adj-nodes (get g :in) nodes outs disj)))))
 
    :remove-edges*
    (fn [g edges]
@@ -266,7 +288,16 @@ on adjacency lists."
   Digraph
   (merge default-digraph-impl
          {:transpose (fn [g]
-                       (assoc g :adj (:in g) :in (:adj g)))}))
+                       ;; Rebuild from reversed edges rather than swapping the
+                       ;; :adj/:in fields. Under ClojureScript, reading those
+                       ;; fields back inside this generated extend-type method
+                       ;; mis-sets :adj to nil; the rebuild form (also used
+                       ;; by the weighted digraph) avoids it and keeps isolated
+                       ;; nodes via the retained :nodeset.
+                       (reduce (fn [tg [n1 n2]]
+                                 (add-edges* tg [[n2 n1]]))
+                               (assoc g :adj {} :in {})
+                               (edges g)))}))
 
 (extend BasicEditableWeightedGraph
   Graph
@@ -294,7 +325,7 @@ on adjacency lists."
      (let [nbrs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes nbrs dissoc)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes nbrs dissoc)))))
 
    :remove-edges*
    (fn [g edges]
@@ -339,8 +370,8 @@ on adjacency lists."
            outs (mapcat #(successors g %) nodes)]
        (-> g
            (update-in [:nodeset] #(apply disj % nodes))
-           (assoc :adj (remove-adj-nodes (:adj g) nodes ins dissoc))
-           (assoc :in (remove-adj-nodes (:in g) nodes outs disj)))))
+           (assoc :adj (remove-adj-nodes (get g :adj) nodes ins dissoc))
+           (assoc :in (remove-adj-nodes (get g :in) nodes outs disj)))))
 
    :remove-edges*
    (fn [g edges]
@@ -465,6 +496,16 @@ on adjacency lists."
   [g]
   (satisfies? Digraph g))
 
+(defn neighbors
+  "Returns all nodes adjacent to node, ignoring edge direction. For an
+  undirected graph this is just the successors; for a digraph it is the union
+  of predecessors and successors."
+  ([g] #(neighbors g %))
+  ([g node]
+   (if (directed? g)
+     (into (set (predecessors g node)) (successors g node))
+     (successors g node))))
+
 (defn weighted?
   "Returns true if g satisfies the WeightedGraph protocol"
   [g]
@@ -496,7 +537,7 @@ on adjacency lists."
                    (assoc :attrs (merge (:attrs g) (:attrs init)))))
              ;; adacency map
              (map? init)
-             (let [es (if (map? (val (first init)))
+             (let [es (if (and (seq init) (map? (val (first init))))
                         (for [[n nbrs] init
                               [nbr wt] nbrs]
                           [n nbr wt])

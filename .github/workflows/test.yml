@@ -1,0 +1,32 @@
+name: test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  clj:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: ['8', '11', '17', '21']
+        clojure: ['clojure-1-10', 'clojure-1-11', 'clojure-1-12']
+    name: clj (JDK ${{ matrix.jdk }}, ${{ matrix.clojure }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.jdk }}
+      - uses: DeLaGuardo/setup-clojure@13.4
+        with:
+          lein: 2.11.2
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ matrix.jdk }}-${{ matrix.clojure }}-${{ hashFiles('project.clj') }}
+          restore-keys: m2-${{ matrix.jdk }}-${{ matrix.clojure }}-
+      - run: lein with-profile +${{ matrix.clojure }} test

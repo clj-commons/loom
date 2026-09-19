@@ -236,46 +236,17 @@
     (recur m2 m1)
     (filter (partial contains? m2) (keys m1))))
 
-#?(:cljs
-   (defn bf-path-bi [outgoing predecessors start end]
-     (throw (js/Error. "Unsupported operation `bf-path-bi`")))
-   :clj
-   (defn bf-path-bi
-     "Using a bidirectional breadth-first search, finds a path from start
-  to end with the fewest hops (i.e. irrespective of edge weights),
-  outgoing and predecessors being functions which return adjacent
-  nodes. Can be much faster than a unidirectional search on certain
-  types of graphs"
-     [outgoing predecessors start end]
-     (let [done? (atom false)
-           preds1 (atom {})             ;from start to end
-           preds2 (atom {})             ;from end to start
-           search (fn [nbrs n preds]
-                    (dorun
-                     (take-while
-                      (fn [_] (not @done?))
-                      (bf-traverse
-                       nbrs n :f (fn [_ pm _] (reset! preds pm))))))
-           search1 (future (search outgoing start preds1))
-           search2 (future (search predecessors end preds2))
-           ;; TODO: watchers?
-           find-intersects #(shared-keys @preds1 @preds2)]
-       (loop [intersects (find-intersects)]
-         (if (or (seq intersects) (future-done? search1) (future-done? search2))
-           (do
-             (reset! done? true)
-             (cond
-               (seq intersects)
-               (let [intersect (apply min-key
-                                      #(+ (count (trace-path @preds1 %))
-                                          (count (trace-path @preds2 %)))
-                                      intersects)]
-                 (concat
-                  (reverse (trace-path @preds1 intersect))
-                  (rest (trace-path @preds2 intersect))))
-               (@preds1 end) (reverse (trace-path @preds1 end))
-               (@preds2 start) (trace-path @preds2 start)))
-           (recur (find-intersects)))))))
+(declare bf-paths-bi)
+
+(defn bf-path-bi
+  "Using a bidirectional breadth-first search, finds a path from start to end
+  with the fewest hops (i.e. irrespective of edge weights). outgoing and
+  predecessors are functions which return adjacent nodes. Returns nil when no
+  path exists."
+  [outgoing predecessors start end]
+  (if (= start end)
+    [start]
+    (first (bf-paths-bi outgoing predecessors start end))))
 
 (defn- reverse-edges [successor-fn nodes coll]
   (for [node nodes

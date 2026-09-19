@@ -204,9 +204,9 @@
                                                   [:a :c :e :d :b]]))
        false (not (some #{(post-traverse g7 1)} [[3 2 1] [2 3 1]]))
        #{1 2 3 4 5 6 7 8} (set (nodes (digraph (pre-span g8))))
-       #{2 3 4} (set (successors (digraph (pre-span g8)) 1))
-       #{1 5} (set (successors (digraph (pre-span g6)) 0))
-       true (let [span (digraph (pre-span g6))]
+       #{2 3 4} (set (successors (digraph (pre-span g8 1)) 1))
+       #{1 5} (set (successors (digraph (pre-span g6 0)) 0))
+       true (let [span (digraph (pre-span g6 0))]
               (and (or (= #{3} (set (successors span 4)))
                        (= #{2} (set (successors span 4))))
                    (or (= #{3} (set (successors span 1)))
@@ -226,8 +226,10 @@
        #{1 2 3} (set (bf-traverse g7 1))
        #{1 2 3 4 5 6 7 8} (set (bf-traverse g8))
        #{1 2 3 4 5 6 7 8} (set (nodes (digraph (bf-span g8))))
-       #{2 3} (set (successors (digraph (bf-span g6)) 1))
-       false (not (some #{(bf-traverse (remove-nodes g6 5))}
+       #{2 3} (set (successors (digraph (bf-span g6 0)) 1))
+       ;; explicit start 0: the 1-arg form starts from the first of (nodes g),
+       ;; which is hash-ordered and so picked a nondeterministic start node.
+       false (not (some #{(bf-traverse (remove-nodes g6 5) 0)}
                         [[0 1 2 3 4] [0 1 3 2 4]]))
        #{:r} (set (bf-traverse g2 :r :when #(< %3 1)))
        #{:r :o :b :g} (set (bf-traverse g2 :r :when #(< %3 2)))
@@ -426,6 +428,16 @@
     #{#{#{2 3 4 5} #{1 6 7 8}}
       #{#{2 3 4 6 7 8} #{1 5}}} (set (bipartite-sets g8))))
 
+(deftest bipartite-color-digraph-sinks-test
+  ;; A 4-cycle as a digraph with sink nodes 1 and 3 (no outgoing edges). Its
+  ;; undirected projection is bipartite, so coloring must follow predecessor
+  ;; edges as well as successors and return a coloring, not nil.
+  (let [di (digraph [2 1] [2 3] [4 3] [4 1])
+        coloring (bipartite-color di)]
+    (is (some? coloring))
+    (is (every? (fn [[u v]] (not= (coloring u) (coloring v))) (edges di)))
+    (is (true? (bipartite? di)))))
+
 (deftest coloring?-test
   (are [expected got] (= expected got)
        true (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 2, 6 1})
@@ -581,6 +593,12 @@
        (set (maximal-cliques maximal-cliques-g1))
        #{#{:a :b :c} #{:b :d :e} #{:e :f}}
        (set (maximal-cliques maximal-cliques-g2))))
+
+(deftest maximal-cliques-digraph-throws
+  ;; Bron-Kerbosch is undirected-only; a digraph must throw rather than
+  ;; return wrong results.
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (maximal-cliques (digraph [:a :b] [:b :c])))))
 
 
 (def subgraph-g6 (graph [0 1] [1 2] [1 3]))

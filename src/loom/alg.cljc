@@ -435,7 +435,7 @@ can use these functions."
                 coloring
                 (let [v (peek queue)
                       color (- 1 (coloring v))
-                      nbrs (graph/successors g v)]
+                      nbrs (graph/neighbors g v)]
                   ;; TODO: could be better
                   (if (some #(and (coloring %) (= (coloring v) (coloring %)))
                             nbrs)
@@ -754,8 +754,13 @@ can use these functions."
                (bk-gen g [r s-p s-x] (pop stack))))))))
 
 (defn maximal-cliques
-  "Enumerate the maximal cliques using Bron-Kerbosch."
+  "Enumerate the maximal cliques using Bron-Kerbosch. Only defined for
+  undirected graphs; throws on a directed graph rather than returning the
+  silently-wrong results Bron-Kerbosch yields there."
   [g]
+  (when (directed? g)
+    (throw (ex-info "maximal-cliques is only defined for undirected graphs"
+                    {:graph g})))
   (bk g))
 
 ;;;
