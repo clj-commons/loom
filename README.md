@@ -1,4 +1,7 @@
-![Loom logo](https://raw.githubusercontent.com/clj-commons/loom/master/doc/loom_logo.png "Loom")
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="doc/loom-logo-dark.png">
+  <img src="doc/loom-logo-light.png" alt="Loom" width="240">
+</picture>
 
 [![Clojars Project](https://img.shields.io/clojars/v/aysylu/loom.svg)](https://clojars.org/aysylu/loom)
 [![cljdoc](https://cljdoc.org/badge/aysylu/loom)](https://cljdoc.org/d/aysylu/loom/CURRENT)
