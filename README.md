@@ -229,6 +229,7 @@ See the [open issues](https://github.com/clj-commons/loom/issues).
 ```bash
 lein test          # default suite
 lein test :all     # includes the slow generative specs
+clojure -M:test-cljs # the suite under ClojureScript on Node (needs Node.js)
 lein all test      # Clojure 1.10, 1.11 and 1.12
 ```
 
