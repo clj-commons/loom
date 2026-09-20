@@ -45,7 +45,7 @@ jobs:
           node-version: '20'
       - uses: DeLaGuardo/setup-clojure@13.4
         with:
-          cli: latest
+          cli: 1.12.0.1530
       - uses: actions/cache@v4
         with:
           path: ~/.m2/repository

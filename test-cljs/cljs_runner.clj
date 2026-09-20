@@ -14,14 +14,19 @@
       (io/delete-file file true))))
 
 (defn test-namespaces []
-  (->> (file-seq (io/file test-dir))
-       (filter #(.isFile %))
-       (filter #(str/ends-with? (.getName %) ".cljc"))
-       (map #(-> (.getName %)
-                 (str/replace #"\.cljc$" "")
-                 (str/replace "_" "-")))
-       (map #(symbol (str "loom.test." %)))
-       sort))
+  (let [root (.toPath (io/file test-dir))
+        namespaces (->> (file-seq (io/file test-dir))
+                        (filter #(.isFile %))
+                        (filter #(str/ends-with? (.getName %) ".cljc"))
+                        (map #(-> (str (.relativize root (.toPath %)))
+                                  (str/replace #"\.cljc$" "")
+                                  (str/replace "_" "-")
+                                  (str/replace "/" ".")))
+                        (map #(symbol (str "loom.test." %)))
+                        sort)]
+    (when (empty? namespaces)
+      (throw (ex-info (str "No .cljc test namespaces found under " test-dir) {})))
+    namespaces))
 
 (defn generated-source [namespaces]
   (str "(ns " generated-ns "\n"
