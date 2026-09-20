@@ -1,12 +1,7 @@
 (ns loom.test.runner
-  (:require [cljs.test :as test]
-            [doo.runner :refer-macros [doo-all-tests doo-tests]]
-            loom.test.alg
-            loom.test.alg-generic
-            loom.test.attr
-            loom.test.derived
-            loom.test.flow
-            loom.test.graph
-            loom.test.label))
+  (:require [cljs.test :as t]))
 
-(doo-all-tests)
+(defmethod t/report [:cljs.test/default :end-run-tests]
+  [{:keys [fail error]}]
+  (when (pos? (+ fail error))
+    (.exit js/process 1)))
