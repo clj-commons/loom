@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.2.1](https://github.com/clj-commons/loom/tree/1.2.1) (2026-09-20)
+
+**Bug fixes:**
+
+- `loom.io/dot-str` wrote invalid DOT when an attribute value was a collection containing quotes, such as `["AA.\"bb\""]`. Backslashes in values that are not strings or keywords are now escaped. String and keyword values are unchanged (#74)
+- The `:graph`, `:node` and `:edge` options of `dot-str` now each end with a newline, so the last option no longer runs into the first edge. An empty options map no longer writes the text `null`
+
+**Documentation:**
+
+- The `dot-str` docstring now lists the `:graph`, `:node` and `:edge` options
+- README, license file, code of conduct and contributing guide refreshed
+
 ## [1.2.0](https://github.com/clj-commons/loom/tree/1.2.0) (2026-09-19)
 
 **Added:**
