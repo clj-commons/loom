@@ -23,7 +23,7 @@ jobs:
           java-version: ${{ matrix.jdk }}
       - uses: DeLaGuardo/setup-clojure@13.7.0
         with:
-          lein: 2.13.0
+          lein: 2.12.0
       - uses: actions/cache@v6
         with:
           path: ~/.m2/repository
