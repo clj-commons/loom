@@ -29,3 +29,13 @@
   (testing "a string value is passed through, so a literal backslash-n stays a Graphviz line break"
     (let [g (add-attr-to-edges (graph [1 2]) :a "x\\ny" [[1 2]])]
       (is (re-find #"\"a\"=\"x\\ny\"" (dot-str g))))))
+
+(deftest dot-str-options-are-statements-test
+  (testing ":graph and :node options each end their own line"
+    (let [out (dot-str (graph [1 2]) :graph {:size "3,3"} :node {:shape :box})]
+      (is (re-find #"(?m)^  graph \[\"size\"=\"3,3\"\]$" out))
+      (is (re-find #"(?m)^  node \[\"shape\"=\"box\"\]$" out))))
+  (testing "an empty options map adds nothing"
+    (let [out (dot-str (graph [1 2]) :node {})]
+      (is (not (re-find #"null" out)))
+      (is (not (re-find #"(?m)^  node" out))))))

@@ -48,7 +48,9 @@
   "Renders graph g as a DOT-format string. Calls (node-label node) and
   (edge-label n1 n2) to determine what labels to use for nodes and edges,
   if any. Weights become edge labels unless a label is specified.
-  Labels also include attributes when the graph satisfies AttrGraph."
+  Labels also include attributes when the graph satisfies AttrGraph. The
+  options :graph, :node and :edge take a map of DOT attributes for the whole
+  graph, every node, or every edge, for example :node {:shape :box}."
   [g & {:keys [graph-name node-label edge-label]
         :or {graph-name "graph"} :as opts }]
   (let [d? (directed? g)
@@ -70,10 +72,11 @@
              (.append (dot-esc graph-name))
              (.append "\" {\n"))]
     (doseq [k [:graph :node :edge]]
-      (when (k opts)
+      (when-let [attrs (dot-attrs (k opts))]
         (doto sb
           (.append (str "  " (name k) " "))
-          (.append (dot-attrs (k opts))))))
+          (.append attrs)
+          (.append "\n"))))
     (doseq [edge (distinct-edges g)]
       (let [n1 (src edge)
             n2 (dest edge)
