@@ -10,7 +10,7 @@
          :exec-fn cognitect.test-runner.api/test
          :exec-args {:patterns ["loom\\.test\\..*"] :excludes [:test-check-slow]}}
 
-  :test-cljs {:extra-paths ["test"]
+  :test-cljs {:extra-paths ["test" "test-cljs"]
               :extra-deps {org.clojure/clojure {:mvn/version "1.12.0"}
                            org.clojure/clojurescript {:mvn/version "1.12.145"}
                            org.clojure/test.check {:mvn/version "1.1.3"}}
