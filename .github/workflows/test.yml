@@ -52,3 +52,13 @@ jobs:
           key: m2-cljs-${{ hashFiles('deps.edn') }}
           restore-keys: m2-cljs-
       - run: clojure -M:test-cljs
+
+  lint:
+    runs-on: ubuntu-latest
+    name: lint (clj-kondo)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeLaGuardo/setup-clojure@13.7.0
+        with:
+          clj-kondo: latest
+      - run: clj-kondo --lint src test --fail-level warning
