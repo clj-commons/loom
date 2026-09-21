@@ -6,7 +6,6 @@
                 :cljs [cljs.test]))
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest are)])]))
 
-
 ;; Trivial case
 (def g0
   (weighted-digraph
@@ -31,7 +30,6 @@
    [:s :a 5]
    [:b :t 10]))
 
-
 (deftest edmonds-karp-test
   (are [max-value network]
        (let [[flow value] (edmonds-karp (successors network)
@@ -41,14 +39,13 @@
          (and (= max-value value)
               (is-admissible-flow? flow (weight network)
                                    :s :t)))
-       23 g1
-       100 g0
-       0 g2))
-
+    23 g1
+    100 g0
+    0 g2))
 
 (deftest max-flow-convenience-test
   (are [max-value network]
        (let [[flow value] (max-flow (weighted-digraph network) :s :t)]
          (and (= max-value value)
               (is-admissible-flow? flow (weight network) :s :t)))
-       23 g1))
+    23 g1))

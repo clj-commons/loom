@@ -1,6 +1,6 @@
 (ns ^{:doc "Dataflow analysis framework"
       :author "Aysylu Greenberg"}
-  loom.dataflow
+ loom.dataflow
   (:require [loom.graph :as g]))
 
 (defn dataflow-analysis
@@ -13,9 +13,9 @@
                 :else #{start})]
     (loop [out-values {}
            queue (into
-                   #?(:clj  clojure.lang.PersistentQueue/EMPTY
-                      :cljs #queue [])
-                   start)]
+                  #?(:clj  clojure.lang.PersistentQueue/EMPTY
+                     :cljs #queue [])
+                  start)]
       (let [node (peek queue)
             worklist (pop queue)
             in-value (join (mapv out-values (g/predecessors graph node)))

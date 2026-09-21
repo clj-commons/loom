@@ -1,6 +1,6 @@
 (ns ^{:doc "Graph algorithms for use on any type of graph"
       :author "Justin Kramer"}
-  loom.alg-generic
+ loom.alg-generic
   (:refer-clojure :exclude [ancestors]))
 
 #?(:clj (do (set! *warn-on-reflection* true)
@@ -85,19 +85,19 @@
   once for each direction."
   [successors start & {:keys [seen] :or {seen #{}}}]
   (letfn [(step [successors start nbrs stack nbrstack seen]
-    (if-let [nbr (first nbrs)]
-      (cons
-        [start nbr]
-        (lazy-seq
-          (let [seen (conj seen start)]
-            (if (seen nbr)
-              (step successors start (next nbrs) stack nbrstack seen)
-              (step successors nbr (successors nbr)
-                    (conj stack start) (conj nbrstack (next nbrs))
-                    seen)))))
-      (when-let [parent (peek stack)]
-        (recur successors parent (peek nbrstack)
-               (pop stack) (pop nbrstack) (conj seen start)))))]
+            (if-let [nbr (first nbrs)]
+              (cons
+               [start nbr]
+               (lazy-seq
+                (let [seen (conj seen start)]
+                  (if (seen nbr)
+                    (step successors start (next nbrs) stack nbrstack seen)
+                    (step successors nbr (successors nbr)
+                          (conj stack start) (conj nbrstack (next nbrs))
+                          seen)))))
+              (when-let [parent (peek stack)]
+                (recur successors parent (peek nbrstack)
+                       (pop stack) (pop nbrstack) (conj seen start)))))]
     (when-not (seen start)
       (step successors start (successors start) [] [] (conj seen start)))))
 
@@ -150,11 +150,11 @@
     (when return-seen
       [nil seen])
     (loop [start start
-          nbrs (successors start)
-          stack []
-          nbrstack []
-          seen seen
-          edges ()]
+           nbrs (successors start)
+           stack []
+           nbrstack []
+           seen seen
+           edges ()]
       (let [seen (conj seen start)]
         (if-let [nbr (first nbrs)]
           (if (seen nbr)
@@ -174,21 +174,21 @@
   Returns nil if the graph contains any cycles. See loom.alg/topsort
   for a complete topological sort"
   ([successors start]
-     (topsort-component successors start #{} #{}))
+   (topsort-component successors start #{} #{}))
   ([successors start seen explored]
-     (loop [seen seen
-            explored explored
-            result ()
-            stack [start]]
-       (if (empty? stack)
-         result
-         (let [v (peek stack)
-               seen (conj seen v)
-               us (remove explored (successors v))]
-           (if (seq us)
-             (when-not (some seen us)
-               (recur seen explored result (conj stack (first us))))
-             (recur seen (conj explored v) (conj result v) (pop stack))))))))
+   (loop [seen seen
+          explored explored
+          result ()
+          stack [start]]
+     (if (empty? stack)
+       result
+       (let [v (peek stack)
+             seen (conj seen v)
+             us (remove explored (successors v))]
+         (if (seq us)
+           (when-not (some seen us)
+             (recur seen explored result (conj stack (first us))))
+           (recur seen (conj explored v) (conj result v) (pop stack))))))))
 
 ;;;
 ;;; Breadth-first traversal
@@ -274,8 +274,8 @@
         overlaps (fn [coll q] (seq (filter #(contains? coll %) q)))
         map-set-pairs (fn [map pairs]
                         (persistent! (reduce (fn [map [key val]]
-                                  (assoc! map key (conj (get map key #{}) val)))
-                                (transient map) pairs)))]
+                                               (assoc! map key (conj (get map key #{}) val)))
+                                             (transient map) pairs)))]
     (loop [outgoing {start nil}
            incoming {end nil}
            q1 (list start)
@@ -335,34 +335,34 @@
   format {node [distance predecessor]}. When f is provided, returns
   a lazy-seq of (f node state) for each node"
   ([successors dist start]
-     (dijkstra-traverse successors dist start vector))
+   (dijkstra-traverse successors dist start vector))
   ([successors dist start f]
-     (letfn [(step [[state pq]]
-               (when-let [[dist-su _ u :as fpq] (first pq)]
-                 (cons
-                  (f u state)
-                  (lazy-seq
-                   (step
-                    (reduce
-                     (fn [[state pq] v]
-                       (let [dist-suv (+ dist-su (dist u v))
-                             dist-sv (first (state v))]
-                         (if (and dist-sv (>= dist-suv dist-sv))
-                           [state pq]
-                           (let [pq (if dist-sv
-                                      (disj pq [dist-sv (hash v) v])
-                                      pq)]
-                             [(assoc state v [dist-suv u])
-                              (conj pq [dist-suv (hash v) v])]))))
-                     [state (disj pq fpq)]
-                     (successors u)))))))]
-       (step [{start [0 nil]}
+   (letfn [(step [[state pq]]
+             (when-let [[dist-su _ u :as fpq] (first pq)]
+               (cons
+                (f u state)
+                (lazy-seq
+                 (step
+                  (reduce
+                   (fn [[state pq] v]
+                     (let [dist-suv (+ dist-su (dist u v))
+                           dist-sv (first (state v))]
+                       (if (and dist-sv (>= dist-suv dist-sv))
+                         [state pq]
+                         (let [pq (if dist-sv
+                                    (disj pq [dist-sv (hash v) v])
+                                    pq)]
+                           [(assoc state v [dist-suv u])
+                            (conj pq [dist-suv (hash v) v])]))))
+                   [state (disj pq fpq)]
+                   (successors u)))))))]
+     (step [{start [0 nil]}
               ;; Poor man's priority queue. Caveats:
               ;; 1) Have to keep it in sync with current state
               ;; 2) Have to include hash codes for non-Comparable items
               ;; 3) O(logn) operations
               ;; Tried clojure.contrib.priority-map but it wasn't any faster
-              (sorted-set [0 (hash start) start])]))))
+            (sorted-set [0 (hash start) start])]))))
 
 (defn dijkstra-span
   "Finds all shortest distances from start, where successors and dist
@@ -424,15 +424,15 @@
             (prn intersect)
             (reset! done? true)
             (cond
-             intersect [(concat
-                         (reverse (trace-path (comp second @state1) intersect))
-                         (rest (trace-path (comp second @state2) intersect)))
-                        (+ (first (@state1 intersect))
-                           (first (@state2 intersect)))]
-             (@state1 end) [(reverse (trace-path (comp second @state1) end))
-                            (first (@state1 end))]
-             (@state2 start) [(trace-path (comp second @state2) start)
-                              (first (@state2 start))]))
+              intersect [(concat
+                          (reverse (trace-path (comp second @state1) intersect))
+                          (rest (trace-path (comp second @state2) intersect)))
+                         (+ (first (@state1 intersect))
+                            (first (@state2 intersect)))]
+              (@state1 end) [(reverse (trace-path (comp second @state1) end))
+                             (first (@state1 end))]
+              (@state2 start) [(trace-path (comp second @state2) start)
+                               (first (@state2 start))]))
 
           (recur (find-intersect))))))
 
@@ -462,7 +462,7 @@
   "Set boolean state of bit in 'bitmap at 'idx to true."
   ^longs [^longs bitmap idx]
   (let [size (max (count bitmap) (bm-longs (inc idx)))
-        new-bitmap (bm-copy bitmap size) 
+        new-bitmap (bm-copy bitmap size)
         chunk (quot idx bits-per-long)
         offset (mod idx bits-per-long)
         mask (bit-set 0 offset)

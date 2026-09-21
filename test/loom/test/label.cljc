@@ -7,8 +7,8 @@
 (deftest labeled-graph-test
   (let [g (g/digraph [1 2] [2 3] [2 4] [3 5] [4 5])
         lg1 (-> g
-               (lbl/add-label 1 "node label")
-               (lbl/add-label 2 3 "edge label"))
+                (lbl/add-label 1 "node label")
+                (lbl/add-label 2 3 "edge label"))
         lg2 (-> (g/digraph)
                 (lbl/add-labeled-nodes
                  1 "node label 1"

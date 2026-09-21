@@ -2,7 +2,7 @@
 Graph, Digraph, or WeightedGraph protocols (as appropriate per algorithm)
 can use these functions."
       :author "Justin Kramer"}
-  loom.alg
+ loom.alg
   (:require [loom.alg-generic :as gen :refer [trace-path preds->span]]
             [loom.flow :as flow]
             [loom.graph
@@ -19,65 +19,65 @@ can use these functions."
 (defn- traverse-all
   [nodes traverse]
   (persistent! (second
-   (reduce
-    (fn [[seen trav] n]
-      (if (seen n)
-        [seen trav]
-        (let [ctrav (traverse n :seen seen)]
-          [(into seen ctrav) (reduce conj! trav ctrav)])))
-    [#{} (transient [])]
-    nodes))))
+                (reduce
+                 (fn [[seen trav] n]
+                   (if (seen n)
+                     [seen trav]
+                     (let [ctrav (traverse n :seen seen)]
+                       [(into seen ctrav) (reduce conj! trav ctrav)])))
+                 [#{} (transient [])]
+                 nodes))))
 
 (defn pre-traverse
   "Traverses graph g depth-first from start. Returns a lazy seq of nodes.
   When no starting node is provided, traverses the entire graph, connected
   or not."
   ([g]
-     (traverse-all (nodes g) (partial gen/pre-traverse (graph/successors g))))
+   (traverse-all (nodes g) (partial gen/pre-traverse (graph/successors g))))
   ([g start]
-     (gen/pre-traverse (graph/successors g) start)))
+   (gen/pre-traverse (graph/successors g) start)))
 
 (defn pre-span
   "Returns a depth-first spanning tree of the form {node [successors]}"
   ([g]
-     (second
-      (reduce
-       (fn [[seen span] n]
-         (if (seen n)
-           [seen span]
-           (let [[cspan seen] (gen/pre-span
-                               (graph/successors g)
-                               n :seen seen :return-seen true)]
-             [seen (merge span {n []} cspan)])))
-       [#{} {}]
-       (nodes g))))
+   (second
+    (reduce
+     (fn [[seen span] n]
+       (if (seen n)
+         [seen span]
+         (let [[cspan seen] (gen/pre-span
+                             (graph/successors g)
+                             n :seen seen :return-seen true)]
+           [seen (merge span {n []} cspan)])))
+     [#{} {}]
+     (nodes g))))
   ([g start]
-     (gen/pre-span (graph/successors g) start)))
+   (gen/pre-span (graph/successors g) start)))
 
 (defn post-traverse
   "Traverses graph g depth-first, post-order from start. Returns a
   vector of the nodes."
   ([g]
-     (traverse-all (nodes g) (partial gen/post-traverse (graph/successors g))))
+   (traverse-all (nodes g) (partial gen/post-traverse (graph/successors g))))
   ([g start & opts]
-     (apply gen/post-traverse (graph/successors g) start opts)))
+   (apply gen/post-traverse (graph/successors g) start opts)))
 
 (defn topsort
   "Topological sort of a directed acyclic graph (DAG). Returns nil if
   g contains any cycles."
   ([g]
-     (loop [seen #{}
-            result ()
-            [n & ns] (seq (nodes g))]
-       (if-not n
-         result
-         (if (seen n)
-           (recur seen result ns)
-           (when-let [cresult (gen/topsort-component
-                               (graph/successors g) n seen seen)]
-             (recur (into seen cresult) (concat cresult result) ns))))))
+   (loop [seen #{}
+          result ()
+          [n & ns] (seq (nodes g))]
+     (if-not n
+       result
+       (if (seen n)
+         (recur seen result ns)
+         (when-let [cresult (gen/topsort-component
+                             (graph/successors g) n seen seen)]
+           (recur (into seen cresult) (concat cresult result) ns))))))
   ([g start]
-     (gen/topsort-component (graph/successors g) start)))
+   (gen/topsort-component (graph/successors g) start)))
 
 (defn bf-traverse
   "Traverses graph g breadth-first from start. When option :f is provided,
@@ -85,38 +85,38 @@ can use these functions."
   Otherwise, returns a lazy seq of the nodes. When option :when is provided,
   filters successors with (f neighbor predecessor depth)."
   ([g]
-     (first
-      (reduce
-       (fn [[cc predmap] n]
-         (if (contains? predmap n)
-           [cc predmap]
-           (reduce
-            (fn [[cc _] [n pm _]]
-              [(conj cc n) pm])
-            [cc predmap]
-            (gen/bf-traverse (graph/successors g) n :f vector :seen predmap))))
-       [[] {}]
-       (nodes g))))
+   (first
+    (reduce
+     (fn [[cc predmap] n]
+       (if (contains? predmap n)
+         [cc predmap]
+         (reduce
+          (fn [[cc _] [n pm _]]
+            [(conj cc n) pm])
+          [cc predmap]
+          (gen/bf-traverse (graph/successors g) n :f vector :seen predmap))))
+     [[] {}]
+     (nodes g))))
   ([g start]
-     (gen/bf-traverse (graph/successors g) start))
+   (gen/bf-traverse (graph/successors g) start))
   ([g start & opts]
-     (apply gen/bf-traverse (graph/successors g) start opts)))
+   (apply gen/bf-traverse (graph/successors g) start opts)))
 
 (defn bf-span
   "Returns a breadth-first spanning tree of the form {node [successors]}"
   ([g]
-     (preds->span
-      (reduce
-       (fn [predmap n]
-         (if (contains? predmap n)
-           predmap
-           (last (gen/bf-traverse (graph/successors g) n
-                                  :f (fn [_ pm _] pm)
-                                  :seen predmap))))
-       {}
-       (nodes g))))
+   (preds->span
+    (reduce
+     (fn [predmap n]
+       (if (contains? predmap n)
+         predmap
+         (last (gen/bf-traverse (graph/successors g) n
+                                :f (fn [_ pm _] pm)
+                                :seen predmap))))
+     {}
+     (nodes g))))
   ([g start]
-     (gen/bf-span (graph/successors g) start)))
+   (gen/bf-span (graph/successors g) start)))
 
 (defn bf-path
   "Returns a path from start to end with the fewest hops (i.e. irrespective
@@ -138,21 +138,21 @@ can use these functions."
   the format {node [distance predecessor]}. When f is provided,
   returns a lazy-seq of (f node state) for each node"
   ([g]
-     (gen/dijkstra-traverse
-      (graph/successors g) (graph/weight g) (first (nodes g))))
+   (gen/dijkstra-traverse
+    (graph/successors g) (graph/weight g) (first (nodes g))))
   ([g start]
-     (gen/dijkstra-traverse (graph/successors g) (graph/weight g) start vector))
+   (gen/dijkstra-traverse (graph/successors g) (graph/weight g) start vector))
   ([g start f]
-     (gen/dijkstra-traverse (graph/successors g) (graph/weight g) start f)))
+   (gen/dijkstra-traverse (graph/successors g) (graph/weight g) start f)))
 
 (defn dijkstra-span
   "Finds all shortest distances from start. Returns a map in the
   format {node {successor distance}}"
   ([g]
-     (gen/dijkstra-span
-      (graph/successors g) (graph/weight g) (first (nodes g))))
+   (gen/dijkstra-span
+    (graph/successors g) (graph/weight g) (first (nodes g))))
   ([g start]
-     (gen/dijkstra-span (graph/successors g) (graph/weight g) start)))
+   (gen/dijkstra-span (graph/successors g) (graph/weight g) start)))
 
 (defn dijkstra-path-dist
   "Finds the shortest path from start to end. Returns a vector:
@@ -207,7 +207,6 @@ can use these functions."
         init-paths (interleave nodes nils)]
     [(apply assoc path-costs init-costs)
      (apply assoc paths init-paths)]))
-
 
 ;;;
 ;;; Graph algorithms
@@ -415,11 +414,10 @@ can use these functions."
         (if (seen (first stack))
           (recur (rest stack) seen cc)
           (let [[c seen] (post-traverse gt (first stack)
-                                      :seen seen :return-seen true)]
+                                        :seen seen :return-seen true)]
             (recur (rest stack)
-                 seen
-                 (conj! cc c))))
-        ))))
+                   seen
+                   (conj! cc c))))))))
 
 (defn strongly-connected?
   [g]
@@ -576,8 +574,6 @@ can use these functions."
                                   {:method-set method-set})))]
     [flow-map flow-value]))
 
-
-
 ;; mst algorithms
 ;; convenience functions for mst algo
 (defn- edge-weights
@@ -587,42 +583,41 @@ can use these functions."
   [wg v]
   (let [edge-weight (fn [u v]
                       (if (weighted? wg) (weight wg u v) 1))]
-    (map #(vec [%1 [v (edge-weight v %1)] ])
-         (successors wg v)))
-  )
+    (map #(vec [%1 [v (edge-weight v %1)]])
+         (successors wg v))))
 
 (defn prim-mst-edges
   "An edge-list of an minimum spanning tree along with weights that
   represents an MST of the given graph. Returns the MST edge-list
   for un-weighted graphs."
   ([wg]
-     (cond
-      (directed? wg) (throw (#?(:clj Exception. :cljs js/Error)
-                             "Spanning tree only defined for undirected graphs"))
-      :else (let [mst (prim-mst-edges wg (nodes wg) nil #{} [])]
-              (if (weighted? wg)
-                mst
-                (map #(vec [(first %1) (second %1)]) mst)))))
+   (cond
+     (directed? wg) (throw (#?(:clj Exception. :cljs js/Error)
+                            "Spanning tree only defined for undirected graphs"))
+     :else (let [mst (prim-mst-edges wg (nodes wg) nil #{} [])]
+             (if (weighted? wg)
+               mst
+               (map #(vec [(first %1) (second %1)]) mst)))))
   ([wg n h visited acc]
-     (cond
-      (empty? n) acc
-      (empty? h) (let [v (first n)
-                       h  (into (pm/priority-map-keyfn second) (edge-weights wg v))]
-                   (recur wg (disj n v) h (conj visited v) acc))
-      :else (let [next_edge (peek h)
-                  u (first (second next_edge))
-                  v (first next_edge)
-                  update-dist (fn [h [v [u wt]]]
-                                (cond
+   (cond
+     (empty? n) acc
+     (empty? h) (let [v (first n)
+                      h  (into (pm/priority-map-keyfn second) (edge-weights wg v))]
+                  (recur wg (disj n v) h (conj visited v) acc))
+     :else (let [next_edge (peek h)
+                 u (first (second next_edge))
+                 v (first next_edge)
+                 update-dist (fn [h [v [u wt]]]
+                               (cond
                                  (nil? (get h v)) (assoc h v [u wt])
                                  (> (second (get h v)) wt) (assoc h v [u wt])
                                  :else h))
-                  wt (second (second next_edge))
-                  visited (conj visited v)
-                  h (reduce update-dist (pop h)
-                            (filter #((complement visited) (first %) )
-                                    (edge-weights wg v)))]
-              (recur wg (disj n v) h (conj visited v)(conj acc [u v wt]))))))
+                 wt (second (second next_edge))
+                 visited (conj visited v)
+                 h (reduce update-dist (pop h)
+                           (filter #((complement visited) (first %))
+                                   (edge-weights wg v)))]
+             (recur wg (disj n v) h (conj visited v) (conj acc [u v wt]))))))
 
 (defn prim-mst
   "Minimum spanning tree of given graph. If the graph contains more than one
@@ -630,61 +625,56 @@ can use these functions."
   [wg]
   (let [mst (apply graph/weighted-graph (prim-mst-edges wg))]
     (cond
-     (= ((comp count nodes) wg) ((comp count nodes) mst)) mst
-     :else (apply add-nodes mst (filter #(zero? (out-degree wg %)) (nodes wg)))
-     )))
+      (= ((comp count nodes) wg) ((comp count nodes) mst)) mst
+      :else (apply add-nodes mst (filter #(zero? (out-degree wg %)) (nodes wg))))))
 
 (defn astar-path
   "Returns the shortest path using A* algorithm. Returns a map of predecessors."
   ([g src target heur]
-     (let [heur (if (nil? heur) (constantly 0) heur)
+   (let [heur (if (nil? heur) (constantly 0) heur)
            ;; store in q => {u [heur+dist parent act est]}
-           q (pm/priority-map-keyfn first src [0 nil 0 0])
-           explored (hash-map)]
-       (astar-path g src target heur q explored))
-       )
+         q (pm/priority-map-keyfn first src [0 nil 0 0])
+         explored (hash-map)]
+     (astar-path g src target heur q explored)))
   ([g src target heur q explored]
-     (cond
+   (cond
       ;; queue empty, target not reachable
-      (empty? q) (throw (ex-info "Target not reachable from source" {}))
+     (empty? q) (throw (ex-info "Target not reachable from source" {}))
       ;; target found, build path and return
-      (= (first (peek q)) target) (let [_ (first (peek q))
-                                        parent ((second (peek q)) 1)
-                                        explored(assoc explored target parent)
-                                        path (loop [s target acc {}]
-                                               (cond
+     (= (first (peek q)) target) (let [_ (first (peek q))
+                                       parent ((second (peek q)) 1)
+                                       explored (assoc explored target parent)
+                                       path (loop [s target acc {}]
+                                              (cond
                                                 (nil? s) acc
                                                 (= s src) (assoc acc s nil)
                                                 :else (recur (explored s)
-                                                             (assoc acc s (explored s)))))
-                                        ]
-                                    path
-                                    )
+                                                             (assoc acc s (explored s)))))]
+                                   path)
       ;; continue searching
-      :else (let
-                [curr-node (first (peek q))
-                 curr-dist ((second (peek q)) 2)
+     :else (let
+            [curr-node (first (peek q))
+             curr-dist ((second (peek q)) 2)
                  ;; update path
-                 explored (assoc explored curr-node ((second (peek q)) 1))
-                 nbrs (remove (into #{} (keys explored)) (successors g curr-node))
+             explored (assoc explored curr-node ((second (peek q)) 1))
+             nbrs (remove (into #{} (keys explored)) (successors g curr-node))
                  ;; we do this for following reasons
                  ;; a. avoiding duplicate heuristics computation
                  ;; b. duplicate entries for nodes, which needs to be removed later
                  ;; TODO: this could be sped up if we priority-map supported transients
-                 update-dist (fn [curr-node curr-dist q v]
-                               (let [act (+ curr-dist
-                                            (if (weighted? g) (weight g curr-node v) 1))
-                                     est (if (nil? (get q v))
-                                           (heur v target) ((get q v) 3))
-                                  ]
-                                 (cond
-                                  (or (nil? (get q v))
-                                      (> ((get q v) 2) act))
-                                  (assoc q v [(+ act est ) curr-node act est])
-                                  :else q)))
-                 q (reduce (partial update-dist curr-node curr-dist) (pop q)
-                           nbrs)]
-              (recur g src target heur q explored)))))
+             update-dist (fn [curr-node curr-dist q v]
+                           (let [act (+ curr-dist
+                                        (if (weighted? g) (weight g curr-node v) 1))
+                                 est (if (nil? (get q v))
+                                       (heur v target) ((get q v) 3))]
+                             (cond
+                               (or (nil? (get q v))
+                                   (> ((get q v) 2) act))
+                               (assoc q v [(+ act est) curr-node act est])
+                               :else q)))
+             q (reduce (partial update-dist curr-node curr-dist) (pop q)
+                       nbrs)]
+             (recur g src target heur q explored)))))
 
 (defn astar-dist
   "Returns the length of the shortest path between src and target using
@@ -694,9 +684,7 @@ can use these functions."
         dist (reduce (fn [c [u v]]
                        (if (nil? v)
                          c
-                         (+ c (if (weighted? g) (weight g v u) 1))
-                         )
-                       ) 0 path)]
+                         (+ c (if (weighted? g) (weight g v u) 1)))) 0 path)]
     dist))
 
 (defn degeneracy-ordering
@@ -745,46 +733,46 @@ can use these functions."
          stack []]
     (cond
      ;; Done
-     (and (empty? stack) (empty? vs))
-     max-clqs
+      (and (empty? stack) (empty? vs))
+      max-clqs
 
      ;; Empty stack, create a seed to generate stack items
-     (empty? stack)
-     (let [v (first vs)
-           succ-v (set (successors g v))]
-       (recur (rest vs)
-              max-clqs
-              (disj p v)
-              (conj x v)
-              [[#{v}
-                (clj.set/intersection p succ-v)
-                (clj.set/intersection x succ-v)]]))
+      (empty? stack)
+      (let [v (first vs)
+            succ-v (set (successors g v))]
+        (recur (rest vs)
+               max-clqs
+               (disj p v)
+               (conj x v)
+               [[#{v}
+                 (clj.set/intersection p succ-v)
+                 (clj.set/intersection x succ-v)]]))
 
      ;; Pull the next request off the stack
-     :else
-     (let [[r s-p s-x] (peek stack)]
-       (cond
+      :else
+      (let [[r s-p s-x] (peek stack)]
+        (cond
         ;; Maximal clique found
-        (and (empty? s-p) (empty? s-x))
-        (recur vs
-               (cons r max-clqs)
-               p
-               x
-               (pop stack))
+          (and (empty? s-p) (empty? s-x))
+          (recur vs
+                 (cons r max-clqs)
+                 p
+                 x
+                 (pop stack))
         ;; No maximal clique that excludes x exists
-        (empty? s-p)
-        (recur vs
-               max-clqs
-               p
-               x
-               (pop stack))
+          (empty? s-p)
+          (recur vs
+                 max-clqs
+                 p
+                 x
+                 (pop stack))
         ;; Use this state to generate more states
-        :else
-        (recur vs
-               max-clqs
-               p
-               x
-               (bk-gen g [r s-p s-x] (pop stack))))))))
+          :else
+          (recur vs
+                 max-clqs
+                 p
+                 x
+                 (bk-gen g [r s-p s-x] (pop stack))))))))
 
 (defn maximal-cliques
   "Enumerate the maximal cliques using Bron-Kerbosch. Only defined for

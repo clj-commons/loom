@@ -1,10 +1,10 @@
 (ns ^{:doc "Network simplex algorithm for solving network flow"
       :author "Daniel Hopkins"}
-  loom.network-simplex
+ loom.network-simplex
   (:refer-clojure :exclude [abs])
   (:require
    [loom.attr
-     :refer [add-attr
+    :refer [add-attr
             attr]]
    [loom.graph
     :refer [nodes
@@ -17,7 +17,6 @@
 ;; https://github.com/networkx/networkx/blob/master/networkx/algorithms/flow/networksimplex
 
 ;; All credit is due to the networkx team, whose code comments are also included below:
-
 
 ;; Find a minimum cost flow satisfying all demands in digraph G.
 ;; This is a primal network simplex algorithm that uses the leaving
@@ -88,7 +87,7 @@
                   :cljs (.ceil js/Math x)))
 
 (defn floor [x] #?(:clj (Math/floor x)
-                  :cljs (.floor js/Math x)))
+                   :cljs (.floor js/Math x)))
 
 (defn- wget
   "Get index i from v, wrapping negative indicies if necessary."
@@ -172,7 +171,7 @@
         ;; size nc
         phis ;; node potentials
         (mapv (fn [d]
-               (if (pos? d) (- inf) inf))
+                (if (pos? d) (- inf) inf))
               D)
         edges (-> (range ec (+ ec nc)) vec) ;; edges to parents
 
@@ -360,14 +359,14 @@
              (if (nil? s)
                omni
                (recur
-                 (-> omni
-                     (update-in [:sizes (mod s nci)]
-                                #(- % size-t))
-                     (update-in [:lasts (mod s nci)]
-                                #(if (= % last-t)
-                                   prev-t
-                                   %)))
-                 (wget (:parents omni) s)))))))))
+                (-> omni
+                    (update-in [:sizes (mod s nci)]
+                               #(- % size-t))
+                    (update-in [:lasts (mod s nci)]
+                               #(if (= % last-t)
+                                  prev-t
+                                  %)))
+                (wget (:parents omni) s)))))))))
 
 (defn- make-root!
   "Make a node q the root of its containing subtree."
@@ -399,20 +398,20 @@
            (assoc-in omni [:prevs (mod next-last-q nci)] prev-q)
            (assoc-in omni [:nexts (mod last-q nci)] q)
            (assoc-in omni [:prevs q] last-q)
-             (let [[omni last-p]
-                   (if (= last-p last-q)
+           (let [[omni last-p]
+                 (if (= last-p last-q)
                      ;; update
-                     [(assoc-in omni [:lasts p] prev-q) prev-q]
+                   [(assoc-in omni [:lasts p] prev-q) prev-q]
                      ;; keep same
-                     [omni last-p])]
+                   [omni last-p])]
                ;; add remaining parts of the subtree rooted at p
                ;; as a subtree of q in the depth-first thread
-               (-> omni
-                   (assoc-in [:prevs p] last-q)
-                   (assoc-in [:nexts (mod last-q nci)] p)
-                   (assoc-in [:nexts (mod last-p nci)] q)
-                   (assoc-in [:prevs q] last-p)
-                   (assoc-in [:lasts q] last-p))))))
+             (-> omni
+                 (assoc-in [:prevs p] last-q)
+                 (assoc-in [:nexts (mod last-q nci)] p)
+                 (assoc-in [:nexts (mod last-p nci)] q)
+                 (assoc-in [:prevs q] last-p)
+                 (assoc-in [:lasts q] last-p))))))
      omni
      (map vector ancestors (rest ancestors)))))
 
@@ -426,25 +425,25 @@
         nci (inc nc)]
     (as-> omni omni
         ;; make q a child of p
-        (assoc-in omni [:edges q] i)
-        (assoc-in omni [:parents q] p)
+      (assoc-in omni [:edges q] i)
+      (assoc-in omni [:parents q] p)
         ;; insert the subtree rooted at q into the depth-first thread
-        (assoc-in omni [:nexts (mod last-p nci)] q)
-        (assoc-in omni [:prevs q] last-p)
-        (assoc-in omni [:prevs (mod next-last-p nci)] last-q)
-        (assoc-in omni [:nexts (mod last-q nci)] next-last-p)
+      (assoc-in omni [:nexts (mod last-p nci)] q)
+      (assoc-in omni [:prevs q] last-p)
+      (assoc-in omni [:prevs (mod next-last-p nci)] last-q)
+      (assoc-in omni [:nexts (mod last-q nci)] next-last-p)
         ;; update the subtree sizes and last descendants of the (new) ancestors of q
-        (loop [omni omni
-               p p]
-          (if (nil? p)
-            omni
-            (recur
-             (-> omni
-                 (update-in [:sizes (mod p nci)]
-                            #(+ (or % 0) size-q))
-                 (update-in [:lasts (mod p nci)]
-                            #(if (= % last-p) last-q %)))
-             (wget (:parents omni) p)))))))
+      (loop [omni omni
+             p p]
+        (if (nil? p)
+          omni
+          (recur
+           (-> omni
+               (update-in [:sizes (mod p nci)]
+                          #(+ (or % 0) size-q))
+               (update-in [:lasts (mod p nci)]
+                          #(if (= % last-p) last-q %)))
+           (wget (:parents omni) p)))))))
 
 (defn- update-potentials!
   "Update the potentials of the nodes in the subtree rooted at a node
@@ -473,26 +472,26 @@
         capacity (residual-capacity omni j s)]
     (as-> omni omni
       (assoc omni :blockmark f)
-          (if-not (pos? capacity)
+      (if-not (pos? capacity)
             ;; nothing to augment
-            omni
-            (augment-flow! omni Wn We capacity))
-          (if (= i j)
+        omni
+        (augment-flow! omni Wn We capacity))
+      (if (= i j)
             ;; do nothing more if the entering edge is the same as the leaving edge
-            omni
-            (let [[s t] ;; ensure that s is the parent of t
-                  (if (not= s (wget (:parents omni) t))
-                    [t s]
-                    [s t])
-                  [p q] ;; ensure that q is in the subtree rooted at t
-                  (if (> (index-of We i) (index-of We j))
-                    [q p]
-                    [p q])]
-              (-> omni
-                  (remove-edge! s t)
-                  (make-root! q)
-                  (add-edge! i p q)
-                  (update-potentials! i p q)))))))
+        omni
+        (let [[s t] ;; ensure that s is the parent of t
+              (if (not= s (wget (:parents omni) t))
+                [t s]
+                [s t])
+              [p q] ;; ensure that q is in the subtree rooted at t
+              (if (> (index-of We i) (index-of We j))
+                [q p]
+                [p q])]
+          (-> omni
+              (remove-edge! s t)
+              (make-root! q)
+              (add-edge! i p q)
+              (update-potentials! i p q)))))))
 
 (defn- pivot-loop
   "Pivot loop"

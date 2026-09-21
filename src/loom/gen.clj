@@ -1,6 +1,6 @@
 (ns ^{:doc "Graph-generating functions"
       :author "Justin Kramer"}
-  loom.gen
+ loom.gen
   (:require [loom.graph :refer [weighted? directed? add-nodes* add-edges*]]))
 
 (defn gen-rand
