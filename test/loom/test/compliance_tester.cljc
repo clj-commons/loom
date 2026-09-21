@@ -3,9 +3,8 @@
   (:require [loom.graph :refer [add-edges add-nodes nodes edges has-node? has-edge?
                                 successors out-degree remove-nodes remove-edges
                                 add-edges* transpose predecessors in-degree weight]]
-            [loom.attr :as attr]
-            #?@(:clj [[clojure.test :refer :all]]))
-  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are is)])]))
+            #?@(:clj [[clojure.test :refer [are testing]]]))
+  #?@(:cljs [(:require-macros [cljs.test :refer (testing are)])]))
 
 (defn graph-test
   "Collection of simple graph tests. Uses the provided empty graph instance, g, to create 

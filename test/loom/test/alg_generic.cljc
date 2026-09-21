@@ -2,14 +2,12 @@
   (:require [loom.alg-generic :as lag]
             [loom.graph :as g]
             [clojure.set :as set]
-            [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
-            #?@(:clj [[clojure.test :refer :all]
+            #?@(:clj [[clojure.test :refer [are deftest is]]
                       [clojure.test.check.clojure-test :refer [defspec]]
                       [clojure.test.check.properties :as prop]]
                 :cljs [clojure.test.check.properties]))
-  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are is)]
-                              [clojure.test.check.clojure-test :refer [defspec]]
+  #?@(:cljs [(:require-macros [cljs.test :refer (deftest are is)]
                               [clojure.test.check.properties :as prop])]))
 
 (defn dag-samples-gen

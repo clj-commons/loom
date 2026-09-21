@@ -1,0 +1,6 @@
+{:config-in-ns
+ {;; def-protocol-impls generates these vars at macro expansion, which
+  ;; clj-kondo cannot resolve statically.
+  loom.graph {:linters {:unresolved-symbol {:level :off}}}
+  loom.attr {:linters {:unresolved-symbol {:level :off}}}
+  loom.label {:linters {:unresolved-symbol {:level :off}}}}}

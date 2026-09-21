@@ -201,7 +201,7 @@
   Otherwise, returns a lazy seq of the nodes. When :when is provided,
   filters successors with (f neighbor predecessor depth)."
   [successors start & {:keys [f when seen]}]
-  (let [f (or f (fn [n p d] n))
+  (let [f (or f (fn [n _ _] n))
         nbr-pred (or when (constantly true))]
     (letfn [(step [queue preds]
               (when-let [[node depth] (peek queue)]
@@ -239,13 +239,6 @@
                       (fn [[_ pm _]] (when (pm end) pm))
                       (apply bf-traverse successors start (apply concat opts)))]
       (reverse (trace-path preds end)))))
-
-(defn- shared-keys
-  "Returns a lazy-seq of the keys that exist in both m1 and m2"
-  [m1 m2]
-  (if (< (count m2) (count m1))
-    (recur m2 m1)
-    (filter (partial contains? m2) (keys m1))))
 
 (declare bf-paths-bi)
 
@@ -393,7 +386,8 @@
                                  (fn [[node _]] (= end node))
                                  (dijkstra-traverse successors dist start)))]
     [(reverse (trace-path (comp second end-state) end))
-     (first (end-state end))]))
+     (first (end-state end))]
+    nil))
 
 (defn dijkstra-path
   "Finds the shortest path from start to end, where successors and dist

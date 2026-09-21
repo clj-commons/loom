@@ -10,3 +10,4 @@ out
 /out
 /.cpcache
 *.js.map
+/.clj-kondo/.cache

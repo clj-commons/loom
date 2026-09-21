@@ -4,21 +4,21 @@
                                 add-edges]]
             [loom.alg :refer [pre-traverse post-traverse pre-span topsort
                               bf-traverse bf-span bf-path
-                              bf-path-bi dijkstra-path dijkstra-path-dist
+                              dijkstra-path dijkstra-path-dist
                               dijkstra-traverse dijkstra-span johnson
                               all-pairs-shortest-paths connected-components
                               connected? scc strongly-connected? connect
                               dag? shortest-path loners bellman-ford
                               bipartite-color bipartite? bipartite-sets
                               coloring? greedy-coloring prim-mst-edges
-                              prim-mst-edges prim-mst astar-path astar-dist
+                              prim-mst astar-path astar-dist
                               degeneracy-ordering maximal-cliques simple-paths
                               subgraph? eql? isomorphism?]]
             [loom.derived :refer [mapped-by]]
             clojure.walk
-            #?@(:clj [[clojure.test :refer :all]]
+            #?@(:clj [[clojure.test :refer [are deftest is]]]
                 :cljs [cljs.test]))
-  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are is)])]))
+  #?@(:cljs [(:require-macros [cljs.test :refer (deftest are is)])]))
 
 ;; http://en.wikipedia.org/wiki/Dijkstra's_algorithm
 (def g1
@@ -235,10 +235,10 @@
        #{:r :o :b :g} (set (bf-traverse g2 :r :when #(< %3 2)))
        #{:r :o :b :g :p} (set (bf-traverse g2 :r :when #(< %3 3)))
        [:a :e :j] (bf-path g4 :a :j)
-       [:a :c :h :j] (bf-path g4 :a :j :when (fn [n p d] (not= :e n)))
+       [:a :c :h :j] (bf-path g4 :a :j :when (fn [n _p _d] (not= :e n)))
        
-       #?@(:clj [[:a :e :j] (bf-path-bi g4 :a :j)
-                 true (some #(= % (bf-path-bi g5 :g :d)) [[:g :a :b :d] [:g :f :e :d]])])))
+       #?@(:clj [[:a :e :j] (loom.alg/bf-path-bi g4 :a :j)
+                 true (some #(= % (loom.alg/bf-path-bi g5 :g :d)) [[:g :a :b :d] [:g :f :e :d]])])))
 
 (deftest simple-paths-test
   (are [expected got] (= expected got)
@@ -541,13 +541,13 @@
 (deftest astar-path-test
   (are [expected got](= expected got)
        {:e :d :d :c :c :b :b :a :a nil}
-       (astar-path astar-simple-path-g1 :a :e (fn [x y] 0))
+       (astar-path astar-simple-path-g1 :a :e (fn [_x _y] 0))
        {:a nil :b :a :c :b}
-       (astar-path astar-with-cycle-g3 :a :c (fn [x y] 0))
+       (astar-path astar-with-cycle-g3 :a :c (fn [_x _y] 0))
        {:a nil :b :a :c :b :d :c}
-       (astar-path astar-with-cycle-g3 :a :d (fn [x y] 0))
+       (astar-path astar-with-cycle-g3 :a :d (fn [_x _y] 0))
        {:a nil :b :a :c :b :d :c}
-       (astar-path astar-weighted-graph-g4 :a :d (fn [x y] 0))
+       (astar-path astar-weighted-graph-g4 :a :d (fn [_x _y] 0))
        ;;all test graphs used for Dijkstra should work for A* as well
        {:a nil, :c :a, :h :c, :j :h} (astar-path g4 :a :j nil)
        {:r nil, :o :r, :p :o} (astar-path g2 :r :p nil))
@@ -557,13 +557,13 @@
 (deftest astar-dist-test
   (are [expected got](= expected got)
        4
-       (astar-dist astar-simple-path-g1 :a :e (fn [x y] 0))
+       (astar-dist astar-simple-path-g1 :a :e (fn [_x _y] 0))
        2
-       (astar-dist astar-with-cycle-g3 :a :c (fn [x y] 0))
+       (astar-dist astar-with-cycle-g3 :a :c (fn [_x _y] 0))
        3
-       (astar-dist astar-with-cycle-g3 :a :d (fn [x y] 0))
+       (astar-dist astar-with-cycle-g3 :a :d (fn [_x _y] 0))
        35
-       (astar-dist astar-weighted-graph-g4 :a :d (fn [x y] 0))
+       (astar-dist astar-weighted-graph-g4 :a :d (fn [_x _y] 0))
        )
   )
 

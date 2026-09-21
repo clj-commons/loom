@@ -1,14 +1,12 @@
 (ns ^{:doc "Output and view graphs in various formats"
       :author "Justin Kramer"}
   loom.io
-  (:require [loom.graph :refer [directed? weighted? nodes edges weight src dest]]
-            [loom.alg :refer [distinct-edges loners]]
+  (:require [loom.graph :refer [directed? weighted? nodes weight src dest]]
+            [loom.alg :refer [distinct-edges]]
             [loom.attr :refer [attr? attr attrs]]
             [clojure.string :refer [escape]]
             [clojure.java.io :refer [file]]
-            [clojure.java.shell :refer [sh]])
-  (:import (java.io FileWriter
-                    FileOutputStream)))
+            [clojure.java.shell :refer [sh]]))
 
 (defn- dot-esc
   [s]
@@ -64,7 +62,7 @@
                        (cond
                          a? #(if-let [a (attr g %1 %2 :label)]
                                a
-                               (if w? (weight g %1 %2)))
+                               (if w? (weight g %1 %2) nil))
                          w? #(weight g %1 %2)
                          :else (constantly nil)))
         sb (doto (StringBuilder.
