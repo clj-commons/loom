@@ -265,6 +265,11 @@
     #{:r :g :b :o :p} (set (map first (dijkstra-traverse g2)))
     {:r {:o 8 :b 5} :b {:g 8} :o {:p 10}} (dijkstra-span g2 :r)))
 
+(deftest bf-path-start-equals-end-test
+  (let [g (graph [1 2])]
+    (is (= [1] (bf-path g 1 1)))
+    (is (= [1 2] (bf-path g 1 2)))))
+
 (deftest johnson-test
   (are [expected got] (= expected got)
     {:p {:p {:o 2, :b 7}
