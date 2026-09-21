@@ -507,7 +507,7 @@
 
 (defn- feasible?
   "Infeasibility and unboundedness detection"
-  [{:keys [N flows] :as _}]
+  [{:keys [N flows]}]
   ;; does flow satisfy all node demands?
   (every? #(zero? (wget flows (- (inc %)))) (range (count N))))
 

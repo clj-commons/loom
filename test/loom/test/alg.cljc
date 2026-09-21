@@ -18,7 +18,6 @@
             clojure.walk
             #?@(:clj [[clojure.test :refer [are deftest is]]]
                 :cljs [cljs.test]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest are is)])]))
 
 ;; http://en.wikipedia.org/wiki/Dijkstra's_algorithm

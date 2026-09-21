@@ -7,7 +7,6 @@
                       [clojure.test.check.clojure-test :refer [defspec]]
                       [clojure.test.check.properties :as prop]]
                 :cljs [clojure.test.check.properties]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest are is)]
                               [clojure.test.check.properties :as prop])]))
 

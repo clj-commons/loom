@@ -5,7 +5,6 @@
             [loom.alg :refer (eql?)]
             #?@(:clj [[clojure.test :refer [are deftest testing]]]
                 :cljs [cljs.test]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are)])]))
 
 (deftest derived-graph-test

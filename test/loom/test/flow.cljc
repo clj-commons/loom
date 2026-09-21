@@ -4,7 +4,6 @@
             [loom.alg :refer [max-flow]]
             #?@(:clj [[clojure.test :refer [are deftest]]]
                 :cljs [cljs.test]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest are)])]))
 
 

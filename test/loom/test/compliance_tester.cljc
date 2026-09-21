@@ -4,7 +4,6 @@
                                 successors out-degree remove-nodes remove-edges
                                 add-edges* transpose predecessors in-degree weight]]
             #?@(:clj [[clojure.test :refer [are testing]]]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (testing are)])]))
 
 (defn graph-test

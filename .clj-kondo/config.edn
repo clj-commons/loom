@@ -1,7 +1,6 @@
-{:linters
- {:unresolved-symbol
-  ;; def-protocol-impls generated vars cannot be resolved statically.
-  {:level :off}
-  :type-mismatch
-  ;; clojure.set/union inference on threaded sequences is a false positive.
-  {:level :off}}}
+{:config-in-ns
+ {;; def-protocol-impls generates these vars at macro expansion, which
+  ;; clj-kondo cannot resolve statically.
+  loom.graph {:linters {:unresolved-symbol {:level :off}}}
+  loom.attr {:linters {:unresolved-symbol {:level :off}}}
+  loom.label {:linters {:unresolved-symbol {:level :off}}}}}

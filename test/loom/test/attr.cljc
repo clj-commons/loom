@@ -2,7 +2,6 @@
   (:require [loom.graph :refer (digraph)]
             [loom.attr :refer (add-attr attr add-attr-to-nodes add-attr-to-edges)]
             #?@(:clj [[clojure.test :refer [deftest is]]]))
-  #_:clj-kondo/ignore
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest is)])]))
 
 (deftest attr-graph-test

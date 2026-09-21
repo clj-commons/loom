@@ -60,5 +60,5 @@ jobs:
       - uses: actions/checkout@v7
       - uses: DeLaGuardo/setup-clojure@13.7.0
         with:
-          clj-kondo: latest
-      - run: clj-kondo --lint src test --fail-level warning
+          clj-kondo: 2026.08.04
+      - run: clj-kondo --lint src test test-cljs --fail-level warning
