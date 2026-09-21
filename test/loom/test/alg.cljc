@@ -557,6 +557,19 @@
   (is (thrown? #?(:clj Exception :cljs js/Error)
                (astar-path astar-with-unreachable-target-g2 :a :e nil))))
 
+(deftest astar-reopens-nodes-for-inconsistent-heuristics-test
+  (let [g (weighted-digraph [:s :a 2]
+                            [:s :b 1]
+                            [:b :a 0.5]
+                            [:a :t 2])
+        heuristic {:a 0 :b 2.5 :t 0}
+        heur (fn [node _target] (heuristic node))
+        astar-predecessors (astar-path g :s :t heur)
+        [dijkstra-path dijkstra-distance] (dijkstra-path-dist g :s :t)]
+    (is (= [:s :b :a :t] dijkstra-path))
+    (is (= dijkstra-distance (astar-dist g :s :t heur)))
+    (is (= {:s nil :b :s :a :b :t :a} astar-predecessors))))
+
 (deftest astar-dist-test
   (are [expected got] (= expected got)
     4

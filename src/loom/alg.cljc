@@ -655,26 +655,28 @@ can use these functions."
      (astar-path g src target heur q explored)))
   ([g src target heur q explored]
    (cond
-      ;; queue empty, target not reachable
+     ;; queue empty, target not reachable
      (empty? q) (throw (ex-info "Target not reachable from source" {}))
       ;; target found, build path and return
      (= (first (peek q)) target) (let [_ (first (peek q))
-                                       parent ((second (peek q)) 1)
-                                       explored (assoc explored target parent)
+                                       entry (second (peek q))
+                                       explored (assoc explored target entry)
                                        path (loop [s target acc {}]
                                               (cond
                                                 (nil? s) acc
                                                 (= s src) (assoc acc s nil)
-                                                :else (recur (explored s)
-                                                             (assoc acc s (explored s)))))]
+                                                :else (let [parent ((explored s) 1)]
+                                                        (recur parent
+                                                               (assoc acc s parent)))))]
                                    path)
       ;; continue searching
      :else (let
             [curr-node (first (peek q))
-             curr-dist ((second (peek q)) 2)
+             curr-entry (second (peek q))
+             curr-dist (curr-entry 2)
                  ;; update path
-             explored (assoc explored curr-node ((second (peek q)) 1))
-             nbrs (remove (into #{} (keys explored)) (successors g curr-node))
+             explored (assoc explored curr-node curr-entry)
+             nbrs (successors g curr-node)
                  ;; we do this for following reasons
                  ;; a. avoiding duplicate heuristics computation
                  ;; b. duplicate entries for nodes, which needs to be removed later
@@ -682,11 +684,11 @@ can use these functions."
              update-dist (fn [curr-node curr-dist q v]
                            (let [act (+ curr-dist
                                         (if (weighted? g) (weight g curr-node v) 1))
-                                 est (if (nil? (get q v))
-                                       (heur v target) ((get q v) 3))]
+                                 known (or (get q v) (get explored v))
+                                 est (if known (known 3) (heur v target))]
                              (cond
-                               (or (nil? (get q v))
-                                   (> ((get q v) 2) act))
+                               (or (nil? known)
+                                   (> (known 2) act))
                                (assoc q v [(+ act est) curr-node act est])
                                :else q)))
              q (reduce (partial update-dist curr-node curr-dist) (pop q)
