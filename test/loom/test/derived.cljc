@@ -59,9 +59,9 @@
 (deftest bipartite-subgraph-test
   (let [dg (digraph [1 2] [2 3] [4 5] [5 6] [3 4] [2 4] [1 6])
         ug (graph dg)]
-   (testing "bipartite subgraph"
-     (are [expected got] (= expected got)
-       '([1 6] [2 4] [3 4]) (sort (edges (bipartite-subgraph dg [1 2 3])))
-       '([5 6]) (edges (bipartite-subgraph dg [4 5]))
-       true (eql? (graph [2 4] [3 4] [5 6])
-                  (bipartite-subgraph ug [4 5]))))))
+    (testing "bipartite subgraph"
+      (are [expected got] (= expected got)
+        '([1 6] [2 4] [3 4]) (sort (edges (bipartite-subgraph dg [1 2 3])))
+        '([5 6]) (edges (bipartite-subgraph dg [4 5]))
+        true (eql? (graph [2 4] [3 4] [5 6])
+                   (bipartite-subgraph ug [4 5]))))))

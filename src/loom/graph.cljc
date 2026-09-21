@@ -3,7 +3,7 @@ Also provides record implementations and constructors for simple graphs --
 weighted, unweighted, directed, and undirected. The implementations are based
 on adjacency lists."
       :author "Justin Kramer"}
-  loom.graph
+ loom.graph
   (:require [loom.alg-generic :refer [bf-traverse]]
             #?@(:clj [[loom.cljs :refer (def-protocol-impls)]]))
   #?@(:cljs [(:require-macros [loom.cljs :refer [def-protocol-impls extend]])]))
@@ -50,23 +50,23 @@ on adjacency lists."
 
 ; Default implementation for maps
 #?(:clj
-    (extend-type clojure.lang.IPersistentMap
-      Edge
-      (src [edge] (:src edge))
-      (dest [edge] (:dest edge)))
-    :cljs
-    (do (extend-type cljs.core.PersistentArrayMap
-          Edge
-          (src [edge] (:src edge))
-          (dest [edge] (:dest edge)))
-        (extend-type cljs.core.PersistentHashMap
-          Edge
-          (src [edge] (:src edge))
-          (dest [edge] (:dest edge)))
-        (extend-type cljs.core.PersistentTreeMap
-          Edge
-          (src [edge] (:src edge))
-          (dest [edge] (:dest edge)))))
+   (extend-type clojure.lang.IPersistentMap
+     Edge
+     (src [edge] (:src edge))
+     (dest [edge] (:dest edge)))
+   :cljs
+   (do (extend-type cljs.core.PersistentArrayMap
+         Edge
+         (src [edge] (:src edge))
+         (dest [edge] (:dest edge)))
+       (extend-type cljs.core.PersistentHashMap
+         Edge
+         (src [edge] (:src edge))
+         (dest [edge] (:dest edge)))
+       (extend-type cljs.core.PersistentTreeMap
+         Edge
+         (src [edge] (:src edge))
+         (dest [edge] (:dest edge)))))
 
 ;; Curried wrappers
 (defn successors
@@ -80,7 +80,7 @@ on adjacency lists."
   ([g node] (predecessors* g node)))
 
 (defn weight
- "Returns the weight of edge e or edge [n1 n2]"
+  "Returns the weight of edge e or edge [n1 n2]"
   ([g] (partial weight g))
   ([g e] (weight* g e))
   ([g n1 n2] (weight* g n1 n2)))
@@ -444,7 +444,7 @@ on adjacency lists."
 (defrecord FlyDigraph [fnodes fedges fsuccessors fpredecessors start])
 (defrecord WeightedFlyGraph [fnodes fedges fsuccessors fweight start])
 (defrecord WeightedFlyDigraph
-    [fnodes fedges fsuccessors fpredecessors fweight start])
+           [fnodes fedges fsuccessors fpredecessors fweight start])
 
 ;; Deprecate the flygraphs?  Instead provide interfaces on algorithms to
 ;; run the algorithm on
@@ -523,34 +523,34 @@ on adjacency lists."
   (letfn [(build [g init]
             (cond
              ;; graph
-             (graph? init)
-             (if (and (weighted? g) (weighted? init))
-               (assoc
-                   (reduce add-edges
-                           (add-nodes* g (nodes init))
-                           (for [[n1 n2] (edges init)]
-                             [n1 n2 (weight init n1 n2)]))
+              (graph? init)
+              (if (and (weighted? g) (weighted? init))
+                (assoc
+                 (reduce add-edges
+                         (add-nodes* g (nodes init))
+                         (for [[n1 n2] (edges init)]
+                           [n1 n2 (weight init n1 n2)]))
                  :attrs (merge (:attrs g) (:attrs init)))
-               (-> g
-                   (add-nodes* (nodes init))
-                   (add-edges* (edges init))
-                   (assoc :attrs (merge (:attrs g) (:attrs init)))))
+                (-> g
+                    (add-nodes* (nodes init))
+                    (add-edges* (edges init))
+                    (assoc :attrs (merge (:attrs g) (:attrs init)))))
              ;; adacency map
-             (map? init)
-             (let [es (if (and (seq init) (map? (val (first init))))
-                        (for [[n nbrs] init
-                              [nbr wt] nbrs]
-                          [n nbr wt])
-                        (for [[n nbrs] init
-                              nbr nbrs]
-                          [n nbr]))]
-               (-> g
-                   (add-nodes* (keys init))
-                   (add-edges* es)))
+              (map? init)
+              (let [es (if (and (seq init) (map? (val (first init))))
+                         (for [[n nbrs] init
+                               [nbr wt] nbrs]
+                           [n nbr wt])
+                         (for [[n nbrs] init
+                               nbr nbrs]
+                           [n nbr]))]
+                (-> g
+                    (add-nodes* (keys init))
+                    (add-edges* es)))
              ;; edge
-             (sequential? init) (add-edges g init)
+              (sequential? init) (add-edges g init)
              ;; node
-             :else (add-nodes g init)))]
+              :else (add-nodes g init)))]
     (reduce build g inits)))
 
 (defn graph
@@ -585,11 +585,11 @@ on adjacency lists."
   start are provided."
   [& {:keys [nodes edges successors predecessors weight start]}]
   (cond
-   (and predecessors weight)
-   (WeightedFlyDigraph. nodes edges successors predecessors weight start)
-   predecessors
-   (FlyDigraph. nodes edges successors predecessors start)
-   weight
-   (WeightedFlyGraph. nodes edges successors weight start)
-   :else
-   (FlyGraph. nodes edges successors start)))
+    (and predecessors weight)
+    (WeightedFlyDigraph. nodes edges successors predecessors weight start)
+    predecessors
+    (FlyDigraph. nodes edges successors predecessors start)
+    weight
+    (WeightedFlyGraph. nodes edges successors weight start)
+    :else
+    (FlyGraph. nodes edges successors start)))

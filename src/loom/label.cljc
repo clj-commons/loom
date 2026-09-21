@@ -1,7 +1,7 @@
 (ns ^{:doc
       "Graph label protocol and implementations for records from loom.graph"
       :author "Justin Kramer"}
-  loom.label
+ loom.label
   (:require [loom.attr :refer [add-attr remove-attr attr]]
             [loom.graph :refer [add-nodes add-edges]]
             #?@(:clj [[loom.cljs :refer (def-protocol-impls)]]))

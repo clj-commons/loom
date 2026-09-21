@@ -21,13 +21,15 @@ lein test :all     # includes the slow generative specs
 clojure -M:test-cljs # the suite under ClojureScript on Node (needs Node.js)
 lein all test      # Clojure 1.10, 1.11 and 1.12
 clojure -M:test    # the same suite with the Clojure CLI
+clj-kondo --lint src test test-cljs --fail-level warning # lint
+clojure -M:cljfmt check src test test-cljs   # formatting (use "fix" to apply)
 ```
 
 We can merge a change if it meets these conditions:
 
 - **Tests first.** Add or update tests for the behavior you change. For a bug
   fix, include a regression test that fails before your fix and passes after.
-- **Green build.** The suite passes on Clojure 1.10, 1.11 and 1.12.
+- **Green build.** The suite passes on Clojure 1.10, 1.11 and 1.12, and lint and formatting checks pass.
 - **One logical change** per pull request.
 
 Code in `.cljc` files runs on both Clojure and ClojureScript. Keep it portable.

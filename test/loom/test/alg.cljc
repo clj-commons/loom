@@ -124,7 +124,6 @@
            [11 2]
            [11 4]))
 
-
 (def g14
   (digraph [1 2]
            [2 3]
@@ -150,21 +149,20 @@
 ;; graphs for mst
 ;; http://en.wikipedia.org/wiki/Kruskal's_algorithm
 (def mst_wt_g1 (weighted-graph '(:a, :e , 1)
-                        '(:c, :d ,2)
-                        '(:a,:b, 3),
-                        '(:b,:e,4),
-                        '(:b,:c,5)
-                        '(:e,:c,6)
-                        '(:e,:d,7)))
+                               '(:c, :d ,2)
+                               '(:a,:b, 3),
+                               '(:b,:e,4),
+                               '(:b,:c,5)
+                               '(:e,:c,6)
+                               '(:e,:d,7)))
 
 ;;graph with 2 components
 (def mst_wt_g2 (weighted-graph [:a :b 2]
-                              [:a :d 1]
-                              [:b :d 2]
-                              [:c :d 3]
-                              [:b :c 1]
-                              [:e :f 1]
-                             ))
+                               [:a :d 1]
+                               [:b :d 2]
+                               [:c :d 3]
+                               [:b :c 1]
+                               [:e :f 1]))
 
 (def mst_unweighted_g3 (graph [:a :b] [:a :c] [:a :d] [:b :d] [:c :d]))
 
@@ -180,137 +178,135 @@
                                [:e :f 10]
                                [:f :g 2]
                                [:i :h 7] [:i :g 6]
-                               [:h :g 1] ))
-
+                               [:h :g 1]))
 
 ;;graph with 2 components and 2 isolated nodes
 (def mst_wt_g7 (weighted-graph [:a :b 2]
                                [:b :d 2]
                                [:e :f 1]
-                               :g :h
-                             ))
+                               :g :h))
 
 (deftest depth-first-test
   (are [expected got] (= expected got)
-       #{1 2 3 5 6 7} (set (pre-traverse g7))
-       #{1 2 3} (set (pre-traverse g7 1))
-       #{1 2 3 4 5 6 7 8} (set (pre-traverse g8))
-       #{1 2 3 4 5 6 7 8} (set (post-traverse g8))
-       [:d :e :f :c :b :a :g] (post-traverse g5 :g)
-       false (not (some #{(pre-traverse g16 :a)} [[:a :e :d :c :b]
-                                                  [:a :b :c :e :d]
-                                                  [:a :b :e :d :c]
-                                                  [:a :c :b :e :d]
-                                                  [:a :c :e :d :b]]))
-       false (not (some #{(post-traverse g7 1)} [[3 2 1] [2 3 1]]))
-       #{1 2 3 4 5 6 7 8} (set (nodes (digraph (pre-span g8))))
-       #{2 3 4} (set (successors (digraph (pre-span g8 1)) 1))
-       #{1 5} (set (successors (digraph (pre-span g6 0)) 0))
-       true (let [span (digraph (pre-span g6 0))]
-              (and (or (= #{3} (set (successors span 4)))
-                       (= #{2} (set (successors span 4))))
-                   (or (= #{3} (set (successors span 1)))
-                       (= #{2} (set (successors span 1))))))
-       [:g :a :b :c :f :e :d] (topsort g5)
-       nil (topsort g7)
-       [5 6 7] (topsort g7 5)
-       
-       [1 2 4] (topsort g15 1)))
+    #{1 2 3 5 6 7} (set (pre-traverse g7))
+    #{1 2 3} (set (pre-traverse g7 1))
+    #{1 2 3 4 5 6 7 8} (set (pre-traverse g8))
+    #{1 2 3 4 5 6 7 8} (set (post-traverse g8))
+    [:d :e :f :c :b :a :g] (post-traverse g5 :g)
+    false (not (some #{(pre-traverse g16 :a)} [[:a :e :d :c :b]
+                                               [:a :b :c :e :d]
+                                               [:a :b :e :d :c]
+                                               [:a :c :b :e :d]
+                                               [:a :c :e :d :b]]))
+    false (not (some #{(post-traverse g7 1)} [[3 2 1] [2 3 1]]))
+    #{1 2 3 4 5 6 7 8} (set (nodes (digraph (pre-span g8))))
+    #{2 3 4} (set (successors (digraph (pre-span g8 1)) 1))
+    #{1 5} (set (successors (digraph (pre-span g6 0)) 0))
+    true (let [span (digraph (pre-span g6 0))]
+           (and (or (= #{3} (set (successors span 4)))
+                    (= #{2} (set (successors span 4))))
+                (or (= #{3} (set (successors span 1)))
+                    (= #{2} (set (successors span 1))))))
+    [:g :a :b :c :f :e :d] (topsort g5)
+    nil (topsort g7)
+    [5 6 7] (topsort g7 5)
+
+    [1 2 4] (topsort g15 1)))
 
 (deftest depth-first-test-2
   (is (#{[1 2 3 4] [1 2 4 3]} (topsort g14 1))))
 
 (deftest breadth-first-test
   (are [expected got] (= expected got)
-       #{1 2 3 5 6 7} (set (bf-traverse g7))
-       #{1 2 3} (set (bf-traverse g7 1))
-       #{1 2 3 4 5 6 7 8} (set (bf-traverse g8))
-       #{1 2 3 4 5 6 7 8} (set (nodes (digraph (bf-span g8))))
-       #{2 3} (set (successors (digraph (bf-span g6 0)) 1))
+    #{1 2 3 5 6 7} (set (bf-traverse g7))
+    #{1 2 3} (set (bf-traverse g7 1))
+    #{1 2 3 4 5 6 7 8} (set (bf-traverse g8))
+    #{1 2 3 4 5 6 7 8} (set (nodes (digraph (bf-span g8))))
+    #{2 3} (set (successors (digraph (bf-span g6 0)) 1))
        ;; explicit start 0: the 1-arg form starts from the first of (nodes g),
        ;; which is hash-ordered and so picked a nondeterministic start node.
-       false (not (some #{(bf-traverse (remove-nodes g6 5) 0)}
-                        [[0 1 2 3 4] [0 1 3 2 4]]))
-       #{:r} (set (bf-traverse g2 :r :when #(< %3 1)))
-       #{:r :o :b :g} (set (bf-traverse g2 :r :when #(< %3 2)))
-       #{:r :o :b :g :p} (set (bf-traverse g2 :r :when #(< %3 3)))
-       [:a :e :j] (bf-path g4 :a :j)
-       [:a :c :h :j] (bf-path g4 :a :j :when (fn [n _p _d] (not= :e n)))
-       
-       #?@(:clj [[:a :e :j] (loom.alg/bf-path-bi g4 :a :j)
-                 true (some #(= % (loom.alg/bf-path-bi g5 :g :d)) [[:g :a :b :d] [:g :f :e :d]])])))
+    false (not (some #{(bf-traverse (remove-nodes g6 5) 0)}
+                     [[0 1 2 3 4] [0 1 3 2 4]]))
+    #{:r} (set (bf-traverse g2 :r :when #(< %3 1)))
+    #{:r :o :b :g} (set (bf-traverse g2 :r :when #(< %3 2)))
+    #{:r :o :b :g :p} (set (bf-traverse g2 :r :when #(< %3 3)))
+    [:a :e :j] (bf-path g4 :a :j)
+    [:a :c :h :j] (bf-path g4 :a :j :when (fn [n _p _d] (not= :e n)))
+
+    #?@(:clj [[:a :e :j] (loom.alg/bf-path-bi g4 :a :j)
+              true (some #(= % (loom.alg/bf-path-bi g5 :g :d)) [[:g :a :b :d] [:g :f :e :d]])])))
 
 (deftest simple-paths-test
   (are [expected got] (= expected got)
-       [[0]] (simple-paths g6 0 0)
-       [[:a]] (simple-paths g5 :a :a)
-       (set [[:a :b :d]
-             [:a :c :e :d]
-             [:a :c :f :e :d]
-             [:a :b :c :e :d]
-             [:a :b :c :f :e :d]]) (set (simple-paths g5 :a :d))
-       (set [[0 1 3 4]
-             [0 1 2 4]]) (set (simple-paths g6 0 4))
-       (set [[:a :b :d]]) (set (simple-paths g11 :a :d))
-       (set [[:a :b :e :f :g]
-             [:a :b :f :g]
-             [:a :b :c :g]
-             [:a :b :c :d :h :g]]) (set (simple-paths g10 :a :g))
-       (set [[:a :b :e :f :g]
-             [:a :b :f :g]
-             [:a :b :c :g]]) (set (simple-paths g10 :a :g :max-depth 5))
-       (set []) (set (simple-paths g10 :a :g :max-depth 2))))
+    [[0]] (simple-paths g6 0 0)
+    [[:a]] (simple-paths g5 :a :a)
+    (set [[:a :b :d]
+          [:a :c :e :d]
+          [:a :c :f :e :d]
+          [:a :b :c :e :d]
+          [:a :b :c :f :e :d]]) (set (simple-paths g5 :a :d))
+    (set [[0 1 3 4]
+          [0 1 2 4]]) (set (simple-paths g6 0 4))
+    (set [[:a :b :d]]) (set (simple-paths g11 :a :d))
+    (set [[:a :b :e :f :g]
+          [:a :b :f :g]
+          [:a :b :c :g]
+          [:a :b :c :d :h :g]]) (set (simple-paths g10 :a :g))
+    (set [[:a :b :e :f :g]
+          [:a :b :f :g]
+          [:a :b :c :g]]) (set (simple-paths g10 :a :g :max-depth 5))
+    (set []) (set (simple-paths g10 :a :g :max-depth 2))))
 
 (deftest dijkstra-test
   (are [expected got] (= expected got)
-       [:a :c :h :j] (dijkstra-path g4 :a :j)
-       [[:a :c :h :j] 487] (dijkstra-path-dist g4 :a :j)
-       [[:r :o :p] 10] (dijkstra-path-dist g2 :r :p)
-       #{:r :g :b :o :p} (set (map first (dijkstra-traverse g2)))
-       {:r {:o 8 :b 5} :b {:g 8} :o {:p 10}} (dijkstra-span g2 :r)))
+    [:a :c :h :j] (dijkstra-path g4 :a :j)
+    [[:a :c :h :j] 487] (dijkstra-path-dist g4 :a :j)
+    [[:r :o :p] 10] (dijkstra-path-dist g2 :r :p)
+    #{:r :g :b :o :p} (set (map first (dijkstra-traverse g2)))
+    {:r {:o 8 :b 5} :b {:g 8} :o {:p 10}} (dijkstra-span g2 :r)))
 
 (deftest johnson-test
   (are [expected got] (= expected got)
-       {:p {:p {:o 2, :b 7}
-            :o {:r 10}
-            :b {:g 10}}
-        :o {:o {:p 2, :r 8}
-            :p {:b 9}
-            :b {:g 12}}
-        :g {:g {:b 3}
-            :b {:r 8, :p 10}
-            :p {:o 12}}
-        :b {:b {:p 7, :g 3, :r 5}
-            :p {:o 9}}
-        :r {:r {:o 8, :b 5}
-            :b {:g 8}
-            :o {:p 10}}} (johnson g2)
+    {:p {:p {:o 2, :b 7}
+         :o {:r 10}
+         :b {:g 10}}
+     :o {:o {:p 2, :r 8}
+         :p {:b 9}
+         :b {:g 12}}
+     :g {:g {:b 3}
+         :b {:r 8, :p 10}
+         :p {:o 12}}
+     :b {:b {:p 7, :g 3, :r 5}
+         :p {:o 9}}
+     :r {:r {:o 8, :b 5}
+         :b {:g 8}
+         :o {:p 10}}} (johnson g2)
 
-        {1 {1 {5 1}, 5 {3 2}, 3 {2 3, 6 3}, 2 {4 4}, 6 {10 4}}
-         2 {2 {4 1}, 4 {10 2}}
-         3 {3 {1 1, 2 1, 6 1}, 1 {5 2}, 2 {4 2}, 6 {10 2}}
-         4 {4 {10 1}, 10 {2 2}}
-         5 {5 {3 1}, 3 {1 2, 2 2, 6 2}, 2 {4 3}, 6 {10 3}}
-         6 {6 {1 1, 10 1}, 1 {5 2}, 10 {2 2}, 2 {4 3}, 5 {3 3}}
-         7 {4 {10 4}, 8 {11 2, 9 2}, 7 {8 1}, 9 {5 3, 3 3}, 11 {4 3, 2 3}, 3 {6 4, 1 4}}
-         8 {4 {10 3}, 8 {11 1, 9 1}, 9 {7 2, 5 2, 3 2}, 11 {4 2, 2 2}, 3 {6 3, 1 3}}
-         9 {8 {11 3}, 6 {10 3}, 7 {8 2}, 2 {4 3}, 9 {7 1, 5 1, 3 1}, 3 {6 2, 2 2, 1 2}}
-         10 {10 {2 1}, 2 {4 2}}
-         11 {11 {2 1, 4 1}, 4 {10 2}}} (johnson g13)
+    {1 {1 {5 1}, 5 {3 2}, 3 {2 3, 6 3}, 2 {4 4}, 6 {10 4}}
+     2 {2 {4 1}, 4 {10 2}}
+     3 {3 {1 1, 2 1, 6 1}, 1 {5 2}, 2 {4 2}, 6 {10 2}}
+     4 {4 {10 1}, 10 {2 2}}
+     5 {5 {3 1}, 3 {1 2, 2 2, 6 2}, 2 {4 3}, 6 {10 3}}
+     6 {6 {1 1, 10 1}, 1 {5 2}, 10 {2 2}, 2 {4 3}, 5 {3 3}}
+     7 {4 {10 4}, 8 {11 2, 9 2}, 7 {8 1}, 9 {5 3, 3 3}, 11 {4 3, 2 3}, 3 {6 4, 1 4}}
+     8 {4 {10 3}, 8 {11 1, 9 1}, 9 {7 2, 5 2, 3 2}, 11 {4 2, 2 2}, 3 {6 3, 1 3}}
+     9 {8 {11 3}, 6 {10 3}, 7 {8 2}, 2 {4 3}, 9 {7 1, 5 1, 3 1}, 3 {6 2, 2 2, 1 2}}
+     10 {10 {2 1}, 2 {4 2}}
+     11 {11 {2 1, 4 1}, 4 {10 2}}} (johnson g13)
 
-         false (johnson g11)
+    false (johnson g11)
 
-         {:e {:e {:b 0}
-              :b {:d 0, :c 0}}
-          :d {:d {:e 0}
-              :e {:b 0}
-              :b {:c 0}}
-          :b {:b {:d 0, :c 0}
-              :d {:e 0}}
-          :c {}
-          :a {:a {:b 10}
-              :b {:d 10, :c 10}
-              :d {:e 10}}} (johnson g12)))
+    {:e {:e {:b 0}
+         :b {:d 0, :c 0}}
+     :d {:d {:e 0}
+         :e {:b 0}
+         :b {:c 0}}
+     :b {:b {:d 0, :c 0}
+         :d {:e 0}}
+     :c {}
+     :a {:a {:b 10}
+         :b {:d 10, :c 10}
+         :d {:e 10}}} (johnson g12)))
 
 (deftest all-pairs-shortest-paths-test
   (is (= {:p {:p {:o 2, :b 7}
@@ -354,87 +350,87 @@
 
 (deftest connectivity-test
   (are [expected got] (= expected got)
-       #{#{5 6 7 8} #{1 2 3 4} #{9}} (set (map set (connected-components
-                                                    (add-nodes g8 9))))
-       [#{:r :g :b :o :p}] (map set (connected-components g2))
-       [#{1 2 3 4 5 6 8 7}] (map set (connected-components g9))
-       true (connected? g6)
-       false (connected? g7)
-       true (connected? g9)
-       #{#{2 3 4 1} #{8} #{7 5 6}} (set (map set (scc g9)))
-       #{#{:b :e :a} #{:h :d :c} #{:f :g}} (set (map set (scc g10)))
-       false (strongly-connected? g9)
-       true (strongly-connected? (digraph g2))
-       #{1 2 3 4 5 6 7 8} (set (nodes (connect g8)))
-       #{:r :g :b :o :p} (set (nodes (connect g2)))))
+    #{#{5 6 7 8} #{1 2 3 4} #{9}} (set (map set (connected-components
+                                                 (add-nodes g8 9))))
+    [#{:r :g :b :o :p}] (map set (connected-components g2))
+    [#{1 2 3 4 5 6 8 7}] (map set (connected-components g9))
+    true (connected? g6)
+    false (connected? g7)
+    true (connected? g9)
+    #{#{2 3 4 1} #{8} #{7 5 6}} (set (map set (scc g9)))
+    #{#{:b :e :a} #{:h :d :c} #{:f :g}} (set (map set (scc g10)))
+    false (strongly-connected? g9)
+    true (strongly-connected? (digraph g2))
+    #{1 2 3 4 5 6 7 8} (set (nodes (connect g8)))
+    #{:r :g :b :o :p} (set (nodes (connect g2)))))
 
 (deftest other-stuff-test
   (are [expected got] (= expected got)
-       false (dag? g2)
-       true (dag? (digraph (bf-span g2)))
-       true (dag? g5)
-       [:a :c :h :j] (shortest-path g4 :a :j)
-       [:a :e :j] (shortest-path (graph g4) :a :j)
-       #{9 10} (set (loners (add-nodes g8 9 10)))
+    false (dag? g2)
+    true (dag? (digraph (bf-span g2)))
+    true (dag? g5)
+    [:a :c :h :j] (shortest-path g4 :a :j)
+    [:a :e :j] (shortest-path (graph g4) :a :j)
+    #{9 10} (set (loners (add-nodes g8 9 10)))
        ;; TODO: the rest
-       ))
+    ))
 
 (deftest bellman-ford-test
   (are [expected graph start]
        (= expected (bellman-ford graph start))
 
-       false g11 :a
-       false g11 :b
-       [{:e ##Inf
-         :d ##Inf
-         :b ##Inf
-         :a ##Inf
-         :c 0}{:c [:c]}] g11 :c
-         false g11 :d
-         false g11 :e
-         [{:e 10,
-           :d 8,
-           :b 3,
-           :c 7,
-           :a 0}
-          {:a [:a],
-           :c [:a :b :c],
-           :b [:a :b],
-           :d [:a :b :d],
-           :e [:a :b :d :e]}] g12 :a
-           [{:e 7,
-             :d 5,
-             :c 4,
-             :a ##Inf,
-             :b 0}
-            {:b [:b],
-             :c [:b :c],
-             :d [:b :d],
-             :e [:b :d :e]}] g12 :b
-             [{:e ##Inf
-               :d ##Inf
-               :b ##Inf
-               :a ##Inf
-               :c 0}
-              {:c [:c]}] g12 :c
-              [{:e 2,
-                :b -5,
-                :c -1,
-                :a ##Inf,
-                :d 0}
-               {:d [:d],
-                :c [:d :e :b :c],
-                :b [:d :e :b],
-                :e [:d :e]}] g12 :d
-                [{:d -2,
-                  :b -7,
-                  :c -3,
-                  :a ##Inf,
-                  :e 0}
-                 {:e [:e],
-                  :c [:e :b :c],
-                  :b [:e :b],
-                  :d [:e :b :d]}] g12 :e))
+    false g11 :a
+    false g11 :b
+    [{:e ##Inf
+      :d ##Inf
+      :b ##Inf
+      :a ##Inf
+      :c 0} {:c [:c]}] g11 :c
+    false g11 :d
+    false g11 :e
+    [{:e 10,
+      :d 8,
+      :b 3,
+      :c 7,
+      :a 0}
+     {:a [:a],
+      :c [:a :b :c],
+      :b [:a :b],
+      :d [:a :b :d],
+      :e [:a :b :d :e]}] g12 :a
+    [{:e 7,
+      :d 5,
+      :c 4,
+      :a ##Inf,
+      :b 0}
+     {:b [:b],
+      :c [:b :c],
+      :d [:b :d],
+      :e [:b :d :e]}] g12 :b
+    [{:e ##Inf
+      :d ##Inf
+      :b ##Inf
+      :a ##Inf
+      :c 0}
+     {:c [:c]}] g12 :c
+    [{:e 2,
+      :b -5,
+      :c -1,
+      :a ##Inf,
+      :d 0}
+     {:d [:d],
+      :c [:d :e :b :c],
+      :b [:d :e :b],
+      :e [:d :e]}] g12 :d
+    [{:d -2,
+      :b -7,
+      :c -3,
+      :a ##Inf,
+      :e 0}
+     {:e [:e],
+      :c [:e :b :c],
+      :b [:e :b],
+      :d [:e :b :d]}] g12 :e))
 
 (deftest bipartite-test
   (are [expected got] (= expected got)
@@ -461,26 +457,26 @@
 
 (deftest coloring?-test
   (are [expected got] (= expected got)
-       true (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 2, 6 1})
-       false (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 1, 6 1})
-       true (coloring? g2 {:r 0, :g 1, :b 2, :p 0, :o 1})
-       true (coloring? g5 {:a 0, :b 1, :c 2, :d 0, :e 1, :f 0, :g 1})
-       false (coloring? g5 {:a 0 :b 1 :c 2 :d 0 :e 1 :f 0 :g nil})))
+    true (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 2, 6 1})
+    false (coloring? g1 {1 0, 2 1, 3 2, 4 0, 5 1, 6 1})
+    true (coloring? g2 {:r 0, :g 1, :b 2, :p 0, :o 1})
+    true (coloring? g5 {:a 0, :b 1, :c 2, :d 0, :e 1, :f 0, :g 1})
+    false (coloring? g5 {:a 0 :b 1 :c 2 :d 0 :e 1 :f 0 :g nil})))
 
 (deftest greedy-coloring-test
   (are [expected got] (= expected got)
-       true (coloring? g1 (greedy-coloring g1))
-       true (coloring? g2 (greedy-coloring g2))
-       true (coloring? g4 (greedy-coloring g4))
-       true (coloring? g5 (greedy-coloring g5))
-       true (coloring? g6 (greedy-coloring g6))
-       true (coloring? g13 (greedy-coloring g13))
+    true (coloring? g1 (greedy-coloring g1))
+    true (coloring? g2 (greedy-coloring g2))
+    true (coloring? g4 (greedy-coloring g4))
+    true (coloring? g5 (greedy-coloring g5))
+    true (coloring? g6 (greedy-coloring g6))
+    true (coloring? g13 (greedy-coloring g13))
        ; expected colors are 0, 1, and 2
-       2 (apply max (vals (greedy-coloring triangle)))))
+    2 (apply max (vals (greedy-coloring triangle)))))
 
 (deftest scc-test
   (are [expected got] (= expected got)
-       #{#{2 4 10} #{1 3 5 6} #{11} #{7 8 9}} (set (map set (scc g13)))))
+    #{#{2 4 10} #{1 3 5 6} #{11} #{7 8 9}} (set (map set (scc g13)))))
 
 (deftest prim-mst-edges-weighted-test
   ; edges are described in different orders depending on platform, probably due
@@ -494,43 +490,41 @@
       [[:c :a 2] [:c :b 2]] (prim-mst-edges mst_wt_g5)
       [[:b :a 4] [:c :b 8] [:c :i 2] [:c :f 4] [:f :g 2]
        [:g :h 1] [:d :c 7] [:e :d 9]]  (prim-mst-edges mst_wt_g6))
-    
+
     (are [solutions result] (contains? solutions result)
       #{(edge-sets [[:d :a 1] [:b :d 2] [:c :b 1] [:e :f 1]])
         (edge-sets [[:d :a 1] [:a :b 2] [:c :b 1] [:e :f 1]])}
       (edge-sets (prim-mst-edges mst_wt_g2))
 
-      
       #{(edge-sets [[:c :a] [:d :b] [:c :d]])
         (edge-sets [[:a :b] [:a :c] [:a :d]])}
       (edge-sets (prim-mst-edges mst_unweighted_g3)))))
 
 (deftest prim-mst-test
   (are [expected got] (= expected got)
-       [#{:a :b :d :e :f :g :h} (set [[:a :b] [:b :d] [:b :a] [:f :e] [:d :b] [:e :f]])]
-       (let [mst (prim-mst mst_wt_g7)]
-         [(nodes mst) (set (edges mst))])
+    [#{:a :b :d :e :f :g :h} (set [[:a :b] [:b :d] [:b :a] [:f :e] [:d :b] [:e :f]])]
+    (let [mst (prim-mst mst_wt_g7)]
+      [(nodes mst) (set (edges mst))])
 
-       [#{:a :b :c} (set [[:a :c] [:c :b] [:c :a] [:b :c]])]
-       (let [mst (prim-mst mst_wt_g5)]
-         [(nodes mst) (set (edges mst))])))
-
+    [#{:a :b :c} (set [[:a :c] [:c :b] [:c :a] [:b :c]])]
+    (let [mst (prim-mst mst_wt_g5)]
+      [(nodes mst) (set (edges mst))])))
 
 ;;;;graphs for A* path
 (def astar-simple-path-g1 (graph [:a :b]
-                            [:b :c]
-                            [:c :d]
-                            [:d :e]))
+                                 [:b :c]
+                                 [:c :d]
+                                 [:d :e]))
 
 ;;graph, with unreachable node
 (def astar-with-unreachable-target-g2 (graph [:a :b]
-                                              [:b :c]
-                                              [:d :e]))
+                                             [:b :c]
+                                             [:d :e]))
 
 (def astar-with-cycle-g3 (digraph [:a :b]
-                             [:b :c]
-                             [:c :d]
-                             [:d :a]))
+                                  [:b :c]
+                                  [:c :d]
+                                  [:d :a]))
 
 (def astar-weighted-graph-g4 (weighted-digraph [:a :b 10]
                                                [:b :c 20]
@@ -539,33 +533,31 @@
                                                [:e :d 100]))
 
 (deftest astar-path-test
-  (are [expected got](= expected got)
-       {:e :d :d :c :c :b :b :a :a nil}
-       (astar-path astar-simple-path-g1 :a :e (fn [_x _y] 0))
-       {:a nil :b :a :c :b}
-       (astar-path astar-with-cycle-g3 :a :c (fn [_x _y] 0))
-       {:a nil :b :a :c :b :d :c}
-       (astar-path astar-with-cycle-g3 :a :d (fn [_x _y] 0))
-       {:a nil :b :a :c :b :d :c}
-       (astar-path astar-weighted-graph-g4 :a :d (fn [_x _y] 0))
+  (are [expected got] (= expected got)
+    {:e :d :d :c :c :b :b :a :a nil}
+    (astar-path astar-simple-path-g1 :a :e (fn [_x _y] 0))
+    {:a nil :b :a :c :b}
+    (astar-path astar-with-cycle-g3 :a :c (fn [_x _y] 0))
+    {:a nil :b :a :c :b :d :c}
+    (astar-path astar-with-cycle-g3 :a :d (fn [_x _y] 0))
+    {:a nil :b :a :c :b :d :c}
+    (astar-path astar-weighted-graph-g4 :a :d (fn [_x _y] 0))
        ;;all test graphs used for Dijkstra should work for A* as well
-       {:a nil, :c :a, :h :c, :j :h} (astar-path g4 :a :j nil)
-       {:r nil, :o :r, :p :o} (astar-path g2 :r :p nil))
+    {:a nil, :c :a, :h :c, :j :h} (astar-path g4 :a :j nil)
+    {:r nil, :o :r, :p :o} (astar-path g2 :r :p nil))
   (is (thrown? #?(:clj Exception :cljs js/Error)
                (astar-path astar-with-unreachable-target-g2 :a :e nil))))
 
 (deftest astar-dist-test
-  (are [expected got](= expected got)
-       4
-       (astar-dist astar-simple-path-g1 :a :e (fn [_x _y] 0))
-       2
-       (astar-dist astar-with-cycle-g3 :a :c (fn [_x _y] 0))
-       3
-       (astar-dist astar-with-cycle-g3 :a :d (fn [_x _y] 0))
-       35
-       (astar-dist astar-weighted-graph-g4 :a :d (fn [_x _y] 0))
-       )
-  )
+  (are [expected got] (= expected got)
+    4
+    (astar-dist astar-simple-path-g1 :a :e (fn [_x _y] 0))
+    2
+    (astar-dist astar-with-cycle-g3 :a :c (fn [_x _y] 0))
+    3
+    (astar-dist astar-with-cycle-g3 :a :d (fn [_x _y] 0))
+    35
+    (astar-dist astar-weighted-graph-g4 :a :d (fn [_x _y] 0))))
 
 (deftest astar-visit-test
   (let [g (graph [0 1] [1 2] [2 3] [3 4])
@@ -609,11 +601,11 @@
                                         [:e :f 1]))
 
 (deftest maximal-cliques-test
-  (are [expected got](= expected got)
-       #{#{:a :b :c} #{:c :d} #{:d :e :f :g} #{:d :h}}
-       (set (maximal-cliques maximal-cliques-g1))
-       #{#{:a :b :c} #{:b :d :e} #{:e :f}}
-       (set (maximal-cliques maximal-cliques-g2))))
+  (are [expected got] (= expected got)
+    #{#{:a :b :c} #{:c :d} #{:d :e :f :g} #{:d :h}}
+    (set (maximal-cliques maximal-cliques-g1))
+    #{#{:a :b :c} #{:b :d :e} #{:e :f}}
+    (set (maximal-cliques maximal-cliques-g2))))
 
 (deftest maximal-cliques-digraph-throws
   ;; Bron-Kerbosch is undirected-only; a digraph must throw rather than
@@ -621,20 +613,19 @@
   (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
                (maximal-cliques (digraph [:a :b] [:b :c])))))
 
-
 (def subgraph-g6 (graph [0 1] [1 2] [1 3]))
 (def subgraph-g7 (digraph [1 2] [2 3] [3 1]))
 
 (deftest subgraph-test
   (are [expected got] (= expected got)
-       true (subgraph? subgraph-g6 g6)
-       false (subgraph? (add-edges subgraph-g6 [0 3])
-                        g6)
-       true (subgraph? subgraph-g7 g7)
-       false (subgraph? (add-nodes subgraph-g7 0)
-                        g7)
-       false (subgraph? (digraph [2 1] [2 3] [3 1])
-                        g7)))
+    true (subgraph? subgraph-g6 g6)
+    false (subgraph? (add-edges subgraph-g6 [0 3])
+                     g6)
+    true (subgraph? subgraph-g7 g7)
+    false (subgraph? (add-nodes subgraph-g7 0)
+                     g7)
+    false (subgraph? (digraph [2 1] [2 3] [3 1])
+                     g7)))
 
 (deftest eql-test
   (are [expected got] (= expected got)
@@ -662,4 +653,4 @@
 
     false (isomorphism? g7 (mapped-by inc g7) dec)
     false (isomorphism? (digraph) (graph) identity)
-    false(isomorphism? (digraph [1 2]) (graph [1 2]) identity)))
+    false (isomorphism? (digraph [1 2]) (graph [1 2]) identity)))

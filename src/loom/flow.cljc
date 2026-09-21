@@ -1,8 +1,7 @@
 (ns ^{:doc "Algorithms for solving network flow"
       :author "Robert Lachlan"}
-  loom.flow
+ loom.flow
   (:require [loom.alg-generic :as gen]))
-
 
 (defn residual-capacity
   "Computes the residual capacity between nodes v1 and v2. Capacity
@@ -120,14 +119,14 @@
    represents flows between vertices, and value is the quantity of
    flow passing from source to sink."
   ([successors predecessors capacity source sink]
-     (edmonds-karp successors predecessors capacity source sink {}))
+   (edmonds-karp successors predecessors capacity source sink {}))
   ([successors predecessors capacity source sink flow]
-     (if-let [path (bf-find-augmenting-path
-                    successors predecessors capacity flow source sink)]
-       (recur successors predecessors capacity source sink
-              (augment-along-path
-               flow capacity path
-               (min-weight-along-path
-                path (partial residual-capacity capacity flow))))
-       (let [value (reduce + (vals (get flow source)))]
-         [flow value]))))
+   (if-let [path (bf-find-augmenting-path
+                  successors predecessors capacity flow source sink)]
+     (recur successors predecessors capacity source sink
+            (augment-along-path
+             flow capacity path
+             (min-weight-along-path
+              path (partial residual-capacity capacity flow))))
+     (let [value (reduce + (vals (get flow source)))]
+       [flow value]))))

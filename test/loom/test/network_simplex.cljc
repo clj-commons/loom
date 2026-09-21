@@ -83,8 +83,7 @@
 (deftest trans-shipment-test
   (testing "Trans-shipment"
     (let [g trans-graph
-          [cost flow] (solve g)
-          ]
+          [cost flow] (solve g)]
       (is (= cost 41))
       (is (= flow
              {:a {:c 0},
@@ -97,7 +96,7 @@
               :r {:a 1, :c 1}})))))
 
 (def maxflow-mincost-graph
-    (build-graph
+  (build-graph
    [[:s :a {:capacity 6}]
     [:s :c {:capacity 10 :cost 10}]
     [:a :b {:cost 6}]

@@ -1,6 +1,6 @@
 (ns ^{:doc "Output and view graphs in various formats"
       :author "Justin Kramer"}
-  loom.io
+ loom.io
   (:require [loom.graph :refer [directed? weighted? nodes weight src dest]]
             [loom.alg :refer [distinct-edges]]
             [loom.attr :refer [attr? attr attrs]]
@@ -50,7 +50,7 @@
   options :graph, :node and :edge take a map of DOT attributes for the whole
   graph, every node, or every edge, for example :node {:shape :box}."
   [g & {:keys [graph-name node-label edge-label]
-        :or {graph-name "graph"} :as opts }]
+        :or {graph-name "graph"} :as opts}]
   (let [d? (directed? g)
         w? (weighted? g)
         a? (attr? g)
@@ -81,7 +81,7 @@
             el (edge-label n1 n2)
             eattrs (assoc (if a?
                             (attrs g n1 n2) {})
-                     :label el)]
+                          :label el)]
         (doto sb
           (.append (str (hash n1)))
           (.append (if d? " -> " " -- "))
@@ -110,8 +110,8 @@
   "Returns :win, :mac, :unix, or nil"
   []
   (condp
-      #(<= 0 (.indexOf ^String %2 ^String %1))
-      (.toLowerCase (System/getProperty "os.name"))
+   #(<= 0 (.indexOf ^String %2 ^String %1))
+   (.toLowerCase (System/getProperty "os.name"))
     "win" :win
     "mac" :mac
     "nix" :unix
@@ -167,4 +167,4 @@
   the shell's path. Possible algorithms include :dot, :neato, :fdp, :sfdp,
   :twopi, and :circo. Possible formats include :png, :ps, :pdf, and :svg."
   [g & {:keys [fmt] :or {fmt :png} :as opts}]
-    (open-data (apply render-to-bytes g (apply concat opts)) fmt))
+  (open-data (apply render-to-bytes g (apply concat opts)) fmt))

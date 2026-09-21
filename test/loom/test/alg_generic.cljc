@@ -24,23 +24,22 @@
   ([] (gen-dag [#{}] 10))
   ([nodes] (gen-dag [#{}] nodes))
   ([dag-so-far nodes]
-     (gen/bind (gen/frequency [[80 (gen/return 1)]
-                               [19 (gen/return 2)]
-                               [1 (gen/return 0)]])
-               (fn [parent-count]
-                 (gen/bind (gen/such-that
-                            (fn [& parents]
-                              (when (not (empty? parents))
-                                (apply distinct? parents)))
-                            (apply gen/tuple
-                                   (repeat (min (count dag-so-far) parent-count)
-                                           (gen/choose 0 (dec (count dag-so-far))))))
-                           (fn [parents]
-                             (if (< 0 nodes)
-                               (gen-dag (conj dag-so-far (set parents))
-                                        (dec nodes))
-                               (dag-samples-gen dag-so-far 0.5))))))))
-
+   (gen/bind (gen/frequency [[80 (gen/return 1)]
+                             [19 (gen/return 2)]
+                             [1 (gen/return 0)]])
+             (fn [parent-count]
+               (gen/bind (gen/such-that
+                          (fn [& parents]
+                            (when (not (empty? parents))
+                              (apply distinct? parents)))
+                          (apply gen/tuple
+                                 (repeat (min (count dag-so-far) parent-count)
+                                         (gen/choose 0 (dec (count dag-so-far))))))
+                         (fn [parents]
+                           (if (< 0 nodes)
+                             (gen-dag (conj dag-so-far (set parents))
+                                      (dec nodes))
+                             (dag-samples-gen dag-so-far 0.5))))))))
 
 (defn anc-model-new [] {})
 
@@ -70,26 +69,26 @@
   (prop/for-all [[dag samples] (gen/bind (gen/choose 0 100)
                                          (fn [dag-size]
                                            (gen-dag dag-size)))]
-    (let [anc (reduce (fn [a [i ps]]
-                        (apply lag/ancestry-add a i (seq ps)))
-                      (lag/ancestry-new)
-                      (map-indexed vector dag))
-          anc-model (reduce (fn [a [i ps]]
-                              (apply anc-model-add a i (seq ps)))
-                            (anc-model-new)
-                            (map-indexed vector dag))
-          samp-pairs (partition 2 samples)
-          anc-to-model (anc->anc-model anc)]
-      (and
-       (= anc-model anc-to-model)
-       (every?
-        (fn [[a b]]
-          (and
-           (= (lag/ancestor? anc b a)
-              (anc-model-anc? anc-model b a))
-           (= (lag/ancestor? anc a b)
-              (anc-model-anc? anc-model a b))))
-        samp-pairs)))))
+                (let [anc (reduce (fn [a [i ps]]
+                                    (apply lag/ancestry-add a i (seq ps)))
+                                  (lag/ancestry-new)
+                                  (map-indexed vector dag))
+                      anc-model (reduce (fn [a [i ps]]
+                                          (apply anc-model-add a i (seq ps)))
+                                        (anc-model-new)
+                                        (map-indexed vector dag))
+                      samp-pairs (partition 2 samples)
+                      anc-to-model (anc->anc-model anc)]
+                  (and
+                   (= anc-model anc-to-model)
+                   (every?
+                    (fn [[a b]]
+                      (and
+                       (= (lag/ancestor? anc b a)
+                          (anc-model-anc? anc-model b a))
+                       (= (lag/ancestor? anc a b)
+                          (anc-model-anc? anc-model a b))))
+                    samp-pairs)))))
 
 ;; test.check's generator runtime does not survive the test build's :advanced
 ;; ClojureScript compilation, so the property-based specs run under Clojure only.
@@ -156,14 +155,14 @@
 
 (deftest tracing-paths
   (are [g n p] (= (sort (lag/trace-paths g n)) p)
-       {:a nil} :a
-       [[:a]]
+    {:a nil} :a
+    [[:a]]
 
-       {:a #{:b} :b nil} :a
-       [[:a :b]]
+    {:a #{:b} :b nil} :a
+    [[:a :b]]
 
-       g1 :a
-       [[:a :b :d] [:a :c :d]]))
+    g1 :a
+    [[:a :b :d] [:a :c :d]]))
 
 (deftest bf-paths-bi-test
   (are [g start end paths] (= (lag/bf-paths-bi g g start end) paths)
@@ -181,50 +180,50 @@
   (are [g start expected] (let [pre (lag/pre-edge-traverse g start)
                                 post (lag/post-edge-traverse g start)]
                             (= expected pre (seq (reverse post))))
-       g1 :d nil
-       
-       g4 :f '([:f :f]))
+    g1 :d nil
+
+    g4 :f '([:f :f]))
   ; covers the whole graph when it's totally connected from start
   (are [g start expected] (let [pre (lag/pre-edge-traverse g start)
                                 post (lag/post-edge-traverse g start)
                                 dg (g/digraph g)
                                 edges (g/edges dg)]
                             (and
-                              (= expected pre (seq (reverse post)))
-                              (= (count edges) (count post))
-                              (= (set edges) (set post))))
-       g1 :a '([:a :b] [:b :d] [:a :c] [:c :d])
-       
-       g4 :a '([:a :b] [:b :a] [:b :c] [:c :b] [:c :c] [:c :e] [:e :c]
-               [:e :d] [:d :b] [:d :c] [:d :e] [:e :f] [:f :f] [:b :d])
-       
-       g4 :c '([:c :b] [:b :a] [:a :b] [:b :c] [:b :d] [:d :b] [:d :c]
-               [:d :e] [:e :c] [:e :d] [:e :f] [:f :f] [:c :c] [:c :e])
-       
-       g5 :a '([:a :b] [:b :d] [:d :c] [:c :a]
-               [:c :d] [:d :b] [:b :a] [:a :c]))
+                             (= expected pre (seq (reverse post)))
+                             (= (count edges) (count post))
+                             (= (set edges) (set post))))
+    g1 :a '([:a :b] [:b :d] [:a :c] [:c :d])
+
+    g4 :a '([:a :b] [:b :a] [:b :c] [:c :b] [:c :c] [:c :e] [:e :c]
+                    [:e :d] [:d :b] [:d :c] [:d :e] [:e :f] [:f :f] [:b :d])
+
+    g4 :c '([:c :b] [:b :a] [:a :b] [:b :c] [:b :d] [:d :b] [:d :c]
+                    [:d :e] [:e :c] [:e :d] [:e :f] [:f :f] [:c :c] [:c :e])
+
+    g5 :a '([:a :b] [:b :d] [:d :c] [:c :a]
+                    [:c :d] [:d :b] [:b :a] [:a :c]))
   ; post traversal returning seen nodes allows complete graph coverage
   ; without duplicates when iterating on all nodes of the graph
   (are [g] (let [dg (g/digraph g)
                  edges (g/edges dg)
                  loop-post-traverse
-                     (loop [nodes (reverse (g/nodes dg))
+                 (loop [nodes (reverse (g/nodes dg))
                             ; reverse makes this more interesting as graphs
                             ; are often specified in the forward direction
-                            seen #{}
-                            acc ()]
-                       (if-let [node (first nodes)]
-                         (let [[edges seen]
-                                   (lag/post-edge-traverse
-                                     g
-                                     node
-                                     :seen seen
-                                     :return-seen true)]
-                           (recur (next nodes)
-                                  seen
-                                  (concat acc edges)))
-                         acc))]
+                        seen #{}
+                        acc ()]
+                   (if-let [node (first nodes)]
+                     (let [[edges seen]
+                           (lag/post-edge-traverse
+                            g
+                            node
+                            :seen seen
+                            :return-seen true)]
+                       (recur (next nodes)
+                              seen
+                              (concat acc edges)))
+                     acc))]
              (and
-               (= (count edges) (count loop-post-traverse))
-               (= (set edges) (set loop-post-traverse))))
-       g1 g2 g3 g4 g5 g6))
+              (= (count edges) (count loop-post-traverse))
+              (= (set edges) (set loop-post-traverse))))
+    g1 g2 g3 g4 g5 g6))

@@ -46,9 +46,9 @@
                       (case (first impl)
                         fn (assoc impls method impl)
                         get-in (let [[_ other-impl-map-name path] impl
-                                      other-impl-map (@protocol-impls
-                                                      (resolve-symbol ns other-impl-map-name))]
-                                  (assoc impls method (get-in other-impl-map path)))))
+                                     other-impl-map (@protocol-impls
+                                                     (resolve-symbol ns other-impl-map-name))]
+                                 (assoc impls method (get-in other-impl-map path)))))
                     {}
                     impl-map)]
       (swap! protocol-impls assoc (resolve-symbol ns name) impl-map)
@@ -73,13 +73,13 @@
 
 (defmacro extend [type & protocols+impls]
   `(extend-type ~type
-         ~@(reduce
-             (fn [impls [protocol imap]]
-               (let [impl-map (resolve-impl-map &env imap)]
-                 (-> (conj impls protocol)
-                     (into (map (fn [[method [_ & arities]]]
-                                  (cons (symbol (name method))
-                                        arities))
-                                impl-map)))))
-             []
-             (partition 2 protocols+impls))))
+     ~@(reduce
+        (fn [impls [protocol imap]]
+          (let [impl-map (resolve-impl-map &env imap)]
+            (-> (conj impls protocol)
+                (into (map (fn [[method [_ & arities]]]
+                             (cons (symbol (name method))
+                                   arities))
+                           impl-map)))))
+        []
+        (partition 2 protocols+impls))))
