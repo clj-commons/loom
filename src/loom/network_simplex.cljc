@@ -4,11 +4,8 @@
   (:refer-clojure :exclude [abs])
   (:require
    [loom.attr
-    :refer [add-attr
-            add-attr-to-nodes
-            add-attr-to-edges
-            attr
-            attrs]]
+     :refer [add-attr
+            attr]]
    [loom.graph
     :refer [nodes
             edges
@@ -106,7 +103,7 @@
   "Extract relevant data from the graph and setup data structures.
 
   Number all nodes and edges and hereafter reference them using only their numbers."
-  [g {:keys [capacity cost demand] :as attr-keys}]
+  [g {:keys [capacity cost demand]}]
   (let [nodes (nodes g)
         N (vec nodes) ;; nodes
         nc (count N)
@@ -148,7 +145,7 @@
   spanning tree of the network simplex method. The new edges will used to
   trivially satisfy the node demands and create an initial strongly
   feasible spanning tree."
-  [{:keys [N D S T C U nc inf] :as omni}]
+  [{:keys [D S T C U nc inf] :as omni}]
   (let [;; TODO(drhops): map-indexed okay in rn?
         ss-edges (map-indexed (fn [p d]
                                 ;; zero-demand nodes must have edges towards root
@@ -168,7 +165,7 @@
 
 (defn- init-spanning-tree
   "Construct the initial spanning tree."
-  [{:keys [N D EI nc ec inf] :as omni}]
+  [{:keys [D nc ec inf] :as omni}]
   (let [;; size nc+ec
         flows (vec (concat (repeat ec 0) (map abs D))) ;; edge flows
 
@@ -200,7 +197,7 @@
 
 (defn- reduced-cost
   "Reduced cost of edge i"
-  [{:keys [S T C U flows phis] :as omni} i]
+  [{:keys [S T C flows phis]} i]
   (let [c (C i)
         phi-s (phis (S i))
         phi-t (phis (T i))]
@@ -214,7 +211,7 @@
   rule. The edges are cyclically grouped into blocks of size B. Within
   each block, Dantzig's rule is applied to find an entering edge. The
   blocks to search is determined following Bland's rule."
-  [{:keys [S T EI C flows blockmark] :as omni}]
+  [{:keys [S T EI flows blockmark] :as omni}]
   (let [ec (count EI)
         _ (assert (pos? ec))
         B (int (ceil (sqrt ec))) ;; pivot block size
@@ -249,7 +246,7 @@
 
 (defn- find-apex
   "Find LCA of p and q in the spanning tree."
-  [{:keys [sizes parents] :as omni} p q]
+  [{:keys [sizes parents]} p q]
   (loop [p p
          q q]
     (if (= p q)
@@ -271,7 +268,7 @@
 
 (defn- trace-path
   "Return the nodes and edges on the path from node p to its ancestor w."
-  [{:keys [parents edges] :as omni} p w]
+  [{:keys [parents edges]} p w]
   (loop [p p
          Wn [p]
          We []]
@@ -321,7 +318,7 @@
 
 (defn- augment-flow!
   "Augment f units of flow along a cycle represented by Wn and We."
-  [{:keys [S flows] :as omni} Wn We f]
+  [{:keys [S] :as omni} Wn We f]
   (reduce (fn [omni [i p]]
             (update-in omni [:flows i]
                        #(+ (or % 0) (if (= (S i) p) f (- f)))))
@@ -339,7 +336,7 @@
 
 (defn- remove-edge!
   "Remove an edge (s, t) where parent[t] == s from the spanning tree."
-  [{:keys [nc edges parents nexts prevs lasts sizes]:as omni} s t]
+  [{:keys [nc parents nexts prevs lasts sizes] :as omni} s t]
   (assert (= s (parents t))
           "s is not the parent of t")
   (let [size-t (sizes t)
@@ -375,7 +372,7 @@
 (defn- make-root!
   "Make a node q the root of its containing subtree."
   [{:keys [nc] :as omni} q]
-  (let [[ancestors q]
+  (let [[ancestors _]
         (loop [ancestors []
                q q]
           (if (nil? q)
@@ -421,7 +418,7 @@
 
 (defn- add-edge!
   "Add an edge (p, q) to the spanning tree where q is the root of a subtree."
-  [{:keys [lasts nexts prevs sizes parents edges nc] :as omni} i p q]
+  [{:keys [lasts nexts sizes nc] :as omni} i p q]
   (let [last-p (lasts p)
         next-last-p (nexts last-p)
         size-q (sizes q)
@@ -452,7 +449,7 @@
 (defn- update-potentials!
   "Update the potentials of the nodes in the subtree rooted at a node
   q connected to its parent p by an edge i"
-  [{:keys [T C nc ec phis] :as omni} i p q]
+  [{:keys [T C phis] :as omni} i p q]
   (let [d (if (= q (T i))
             (+ (phis p) (- (C i)) (- (phis q)))
             (+ (phis p) (C i) (- (phis q))))
@@ -510,29 +507,20 @@
 
 (defn- feasible?
   "Infeasibility and unboundedness detection"
-  [{:keys [N D S T flows] :as omni}]
+  [{:keys [N flows] :as _}]
   ;; does flow satisfy all node demands?
   (every? #(zero? (wget flows (- (inc %)))) (range (count N))))
 
 (defn- summarize
   "Flow cost calculation and flow map construction"
-  [{:keys [N D E EI S T U C flows parents phis] :as omni}]
+  [{:keys [N EI S T C flows] :as omni}]
 
   (if-not (feasible? omni)
     [nil nil]
-    (let [nc (count N)
-          ec (count EI)
+    (let [ec (count EI)
 
           flows (subvec flows 0 ec)
           flow-cost (apply + (map * C flows))
-
-          D' (reduce
-              (fn [D [s t f]]
-                (-> D
-                    (update s #(+ (or % 0) f))
-                    (update t #(- (or % 0) f))))
-              D
-              (map vector S T flows))
 
           S (mapv #(N %) (take ec S)) ;; use original nodes
           T (mapv #(N %) (take ec T)) ;; use original nodes

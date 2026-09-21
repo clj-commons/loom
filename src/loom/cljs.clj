@@ -67,7 +67,7 @@
      (if (namespace imap)
        imap
        (resolve-symbol (:ns env) imap)))
-    :default
+    :else
     (throw (ex-info "Unsupported `extend` impl map"
                     {:impl-map imap}))))
 
@@ -83,5 +83,3 @@
                                 impl-map)))))
              []
              (partition 2 protocols+impls))))
-
-

@@ -1,7 +1,7 @@
 (ns ^{:doc "Algorithms for solving network flow"
       :author "Robert Lachlan"}
   loom.flow
-  (:require [loom.alg-generic :as gen :refer [bf-path]]))
+  (:require [loom.alg-generic :as gen]))
 
 
 (defn residual-capacity

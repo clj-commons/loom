@@ -21,14 +21,15 @@
             in-value (join (mapv out-values (g/predecessors graph node)))
             out (transfer node in-value)
             update? (not= out (get out-values node))
-            out-values (if update?
-                         (assoc out-values node out)
-                         out-values)
+            next-out-values (if update?
+                              (assoc out-values node out)
+                              out-values)
             workset (set worklist)
             worklist (if update?
                        (->> (g/successors graph node)
                             (remove workset)
-                            (into worklist)))]
+                            (into worklist))
+                       nil)]
         (if (seq worklist)
-          (recur out-values worklist)
-          out-values)))))
+          (recur next-out-values worklist)
+          next-out-values)))))

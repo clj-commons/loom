@@ -3,13 +3,12 @@ Graph, Digraph, or WeightedGraph protocols (as appropriate per algorithm)
 can use these functions."
       :author "Justin Kramer"}
   loom.alg
-  (:require [loom.alg-generic :as gen]
+  (:require [loom.alg-generic :as gen :refer [trace-path preds->span]]
             [loom.flow :as flow]
             [loom.graph
              :refer [add-nodes add-edges nodes edges successors weight predecessors
                      out-degree in-degree weighted? directed? graph digraph transpose]
              :as graph]
-            [loom.alg-generic :refer [trace-path preds->span]]
             #?(:clj [clojure.data.priority-map :as pm]
                :cljs [tailrecursion.priority-map :as pm])
             [clojure.set :as clj.set]))
@@ -169,7 +168,7 @@ can use these functions."
 (defn- can-relax-edge?
   "Tests for whether we can improve the shortest path to v found so far
    by going through u."
-  [[u v :as edge] weight costs]
+  [[u v] weight costs]
   (let [vd (get costs v)
         ud (get costs u)
         sum (+ ud weight)]
@@ -188,7 +187,7 @@ can use these functions."
 
 (defn- relax-edges
   "Performs edge relaxation on all edges in weighted directed graph"
-  [g start estimates]
+  [g _ estimates]
   (->> (edges g)
        (reduce (fn [estimates [u v :as edge]]
                  (relax-edge edge (graph/weight g u v) estimates))
@@ -617,20 +616,19 @@ can use these functions."
                                 (cond
                                  (nil? (get h v)) (assoc h v [u wt])
                                  (> (second (get h v)) wt) (assoc h v [u wt])
-                                 :else h))]
-              (let [wt (second (second next_edge))
-                    visited (conj visited v)
-                    h (reduce update-dist (pop h)
-                              (filter #((complement visited) (first %) )
-                                      (edge-weights wg v)))]
-                (recur wg (disj n v) h (conj visited v)(conj acc [u v wt])))))))
+                                 :else h))
+                  wt (second (second next_edge))
+                  visited (conj visited v)
+                  h (reduce update-dist (pop h)
+                            (filter #((complement visited) (first %) )
+                                    (edge-weights wg v)))]
+              (recur wg (disj n v) h (conj visited v)(conj acc [u v wt]))))))
 
 (defn prim-mst
   "Minimum spanning tree of given graph. If the graph contains more than one
    component then returns a spanning forest of minimum spanning trees."
   [wg]
-  (let [mst (apply graph/weighted-graph (prim-mst-edges wg))
-        ]
+  (let [mst (apply graph/weighted-graph (prim-mst-edges wg))]
     (cond
      (= ((comp count nodes) wg) ((comp count nodes) mst)) mst
      :else (apply add-nodes mst (filter #(zero? (out-degree wg %)) (nodes wg)))
@@ -639,7 +637,7 @@ can use these functions."
 (defn astar-path
   "Returns the shortest path using A* algorithm. Returns a map of predecessors."
   ([g src target heur]
-     (let [heur (if (nil? heur) (fn [x y] 0) heur)
+     (let [heur (if (nil? heur) (constantly 0) heur)
            ;; store in q => {u [heur+dist parent act est]}
            q (pm/priority-map-keyfn first src [0 nil 0 0])
            explored (hash-map)]
@@ -650,7 +648,7 @@ can use these functions."
       ;; queue empty, target not reachable
       (empty? q) (throw (ex-info "Target not reachable from source" {}))
       ;; target found, build path and return
-      (= (first (peek q)) target) (let [u (first (peek q))
+      (= (first (peek q)) target) (let [_ (first (peek q))
                                         parent ((second (peek q)) 1)
                                         explored(assoc explored target parent)
                                         path (loop [s target acc {}]

@@ -1,0 +1,7 @@
+{:linters
+ {:unresolved-symbol
+  ;; def-protocol-impls generated vars cannot be resolved statically.
+  {:level :off}
+  :type-mismatch
+  ;; clojure.set/union inference on threaded sequences is a false positive.
+  {:level :off}}}
