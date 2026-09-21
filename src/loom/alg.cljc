@@ -334,7 +334,7 @@ can use these functions."
                                              (+ (weight wg u v) (- (dist-q u)
                                                                    (dist-q v)))))
                         (graph/edges wg))]
-        (graph/add-edges* wg new-es))
+        [(graph/add-edges* wg new-es) dist-q])
       false)))
 
 (defn johnson
@@ -347,16 +347,33 @@ can use these functions."
   Most callers should use shortest-paths and allow the most efficient implementation be selected
   for the graph."
   [g]
-  (let [g (if (and (weighted? g) (some (partial > 0) (map (graph/weight g) (graph/edges g))))
-            (bellman-ford-transform g)
-            g)]
-    (if (false? g)
+  (let [transformed (if (and (weighted? g) (some (partial > 0) (map (graph/weight g) (graph/edges g))))
+                      (bellman-ford-transform g)
+                      [g nil])]
+    (if (false? transformed)
       false
-      (let [dist (if (weighted? g)
+      (let [[g potentials] transformed
+            dist (if (weighted? g)
                    (weight g)
                    (fn [u v] (when (graph/has-edge? g u v) 1)))]
         (reduce (fn [acc node]
-                  (assoc acc node (gen/dijkstra-span (successors g) dist node)))
+                  (let [span (gen/dijkstra-span (successors g) dist node)
+                        span (if potentials
+                               (reduce-kv
+                                (fn [corrected parent children]
+                                  (assoc corrected parent
+                                         (reduce-kv
+                                          (fn [children target distance]
+                                            (assoc children target
+                                                   (+ distance
+                                                      (- (potentials node))
+                                                      (potentials target))))
+                                          {}
+                                          children)))
+                                {}
+                                span)
+                               span)]
+                    (assoc acc node span)))
                 {}
                 (nodes g))))))
 
