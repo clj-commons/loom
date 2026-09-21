@@ -2,9 +2,10 @@
   (:require [loom.graph :refer (weighted-digraph successors predecessors weight)]
             [loom.flow :refer (edmonds-karp is-admissible-flow?)]
             [loom.alg :refer [max-flow]]
-            #?@(:clj [[clojure.test :refer :all]]
+            #?@(:clj [[clojure.test :refer [are deftest]]]
                 :cljs [cljs.test]))
-  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are is)])]))
+  #_:clj-kondo/ignore
+  #?@(:cljs [(:require-macros [cljs.test :refer (deftest are)])]))
 
 
 ;; Trivial case

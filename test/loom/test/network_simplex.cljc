@@ -1,8 +1,8 @@
 (ns loom.test.network-simplex
   (:require
    [loom.network-simplex :refer [build-graph solve]]
-   #?(:cljs [cljs.test    :as t :refer-macros [is are deftest testing run-tests]]
-      :clj  [clojure.test :as t :refer        [is are deftest testing]])))
+   #?(:cljs [cljs.test :refer-macros [is deftest testing]]
+      :clj  [clojure.test :refer [is deftest testing]])))
 
 ;; The majority of these tests are ported to cljc from networkx's python implementation:
 ;; https://github.com/networkx/networkx/blob/master/networkx/algorithms/flow/tests/test_mincost.py

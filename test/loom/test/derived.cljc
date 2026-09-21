@@ -3,9 +3,10 @@
                                   subgraph-reachable-from bipartite-subgraph]]
             [loom.graph :refer (graph digraph edges)]
             [loom.alg :refer (eql?)]
-            #?@(:clj [[clojure.test :refer :all]]
+            #?@(:clj [[clojure.test :refer [are deftest testing]]]
                 :cljs [cljs.test]))
-  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are is)])]))
+  #_:clj-kondo/ignore
+  #?@(:cljs [(:require-macros [cljs.test :refer (deftest testing are)])]))
 
 (deftest derived-graph-test
   (let [g  (graph [1 2] [1 3] [2 3] 4)

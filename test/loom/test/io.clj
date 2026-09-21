@@ -1,7 +1,7 @@
 (ns loom.test.io
   (:require [clojure.string :as str]
-            [clojure.test :refer :all]
-            [loom.attr :refer [add-attr-to-edges add-attr]]
+            [clojure.test :refer [deftest is testing]]
+            [loom.attr :refer [add-attr-to-edges]]
             [loom.graph :refer [graph]]
             [loom.io :refer [dot-str]]))
 
