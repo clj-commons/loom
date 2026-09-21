@@ -62,3 +62,22 @@ jobs:
         with:
           clj-kondo: 2026.08.04
       - run: clj-kondo --lint src test test-cljs --fail-level warning
+
+  format:
+    runs-on: ubuntu-latest
+    name: format (cljfmt)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: DeLaGuardo/setup-clojure@13.7.0
+        with:
+          cli: 1.12.6.1673
+      - uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: m2-cljfmt-${{ hashFiles('deps.edn') }}
+          restore-keys: m2-cljfmt-
+      - run: clojure -M:cljfmt check src test test-cljs
