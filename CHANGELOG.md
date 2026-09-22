@@ -1,5 +1,11 @@
 # Change Log
 
+## [Unreleased]
+
+**Bug fixes:**
+
+- `loom.dataflow/dataflow-analysis` could return before its worklist was empty. When a node's value stopped changing, the remaining queued nodes were dropped instead of processed, so cyclic graphs could come back missing definitions. Contributed by [Iain](https://github.com/NotAFlightRisk) (#159)
+
 ## [1.2.1](https://github.com/clj-commons/loom/tree/1.2.1) (2026-09-20)
 
 **Bug fixes:**
