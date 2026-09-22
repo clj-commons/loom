@@ -29,7 +29,7 @@
                        (->> (g/successors graph node)
                             (remove workset)
                             (into worklist))
-                       nil)]
+                       worklist)]
         (if (seq worklist)
           (recur next-out-values worklist)
           next-out-values)))))
