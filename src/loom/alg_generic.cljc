@@ -234,11 +234,13 @@
   "Returns a path from start to end with the fewest hops (i.e. irrespective
   of edge weights), successors being a function that returns adjacent nodes"
   [successors start end & {:as opts}]
-  (let [opts (merge opts {:f vector})]
-    (when-let [preds (some
-                      (fn [[_ pm _]] (when (pm end) pm))
-                      (apply bf-traverse successors start (apply concat opts)))]
-      (reverse (trace-path preds end)))))
+  (if (= start end)
+    [start]
+    (let [opts (merge opts {:f vector})]
+      (when-let [preds (some
+                        (fn [[_ pm _]] (when (pm end) pm))
+                        (apply bf-traverse successors start (apply concat opts)))]
+        (reverse (trace-path preds end))))))
 
 (declare bf-paths-bi)
 

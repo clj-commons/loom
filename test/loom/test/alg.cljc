@@ -265,6 +265,11 @@
     #{:r :g :b :o :p} (set (map first (dijkstra-traverse g2)))
     {:r {:o 8 :b 5} :b {:g 8} :o {:p 10}} (dijkstra-span g2 :r)))
 
+(deftest bf-path-start-equals-end-test
+  (let [g (graph [1 2])]
+    (is (= [1] (bf-path g 1 1)))
+    (is (= [1 2] (bf-path g 1 2)))))
+
 (deftest johnson-test
   (are [expected got] (= expected got)
     {:p {:p {:o 2, :b 7}
@@ -296,17 +301,21 @@
 
     false (johnson g11)
 
-    {:e {:e {:b 0}
-         :b {:d 0, :c 0}}
-     :d {:d {:e 0}
-         :e {:b 0}
-         :b {:c 0}}
-     :b {:b {:d 0, :c 0}
-         :d {:e 0}}
+    {:e {:e {:b -7}
+         :b {:d -2, :c -3}}
+     :d {:d {:e 2}
+         :e {:b -5}
+         :b {:c -1}}
+     :b {:b {:d 5, :c 4}
+         :d {:e 7}}
      :c {}
-     :a {:a {:b 10}
-         :b {:d 10, :c 10}
+     :a {:a {:b 3}
+         :b {:d 8, :c 7}
          :d {:e 10}}} (johnson g12)))
+
+(deftest johnson-restores-original-distances-test
+  (is (= {:b 3 :c 7 :d 8 :e 10}
+         (apply merge (vals (:a (johnson g12)))))))
 
 (deftest all-pairs-shortest-paths-test
   (is (= {:p {:p {:o 2, :b 7}
@@ -547,6 +556,19 @@
     {:r nil, :o :r, :p :o} (astar-path g2 :r :p nil))
   (is (thrown? #?(:clj Exception :cljs js/Error)
                (astar-path astar-with-unreachable-target-g2 :a :e nil))))
+
+(deftest astar-reopens-nodes-for-inconsistent-heuristics-test
+  (let [g (weighted-digraph [:s :a 2]
+                            [:s :b 1]
+                            [:b :a 0.5]
+                            [:a :t 2])
+        heuristic {:a 0 :b 2.5 :t 0}
+        heur (fn [node _target] (heuristic node))
+        astar-predecessors (astar-path g :s :t heur)
+        [dijkstra-path dijkstra-distance] (dijkstra-path-dist g :s :t)]
+    (is (= [:s :b :a :t] dijkstra-path))
+    (is (= dijkstra-distance (astar-dist g :s :t heur)))
+    (is (= {:s nil :b :s :a :b :t :a} astar-predecessors))))
 
 (deftest astar-dist-test
   (are [expected got] (= expected got)
