@@ -8,6 +8,7 @@
 - `loom.alg/bf-path` with start equal to end returned nil instead of a zero-hop path `[start]` (#161)
 - `loom.alg/johnson` returned distances offset by Bellman-Ford potentials; it now subtracts and adds the potentials to restore the original shortest-path distances (#161)
 - `loom.alg/astar-path` did not reopen closed nodes when a shorter path was found later, causing incorrect paths with inconsistent heuristics; nodes are now reopened when a shorter distance is discovered (#161)
+- `loom.attr/add-attrs-to-all` was using a sliding window over the flat key/value list, causing every node and edge to acquire spurious attributes keyed by each value. Now pairs keys and values correctly (#163)
 
 ## [1.2.1](https://github.com/clj-commons/loom/tree/1.2.1) (2026-09-20)
 

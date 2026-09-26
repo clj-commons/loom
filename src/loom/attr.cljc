@@ -116,7 +116,7 @@ thickness, etc)."
      (-> g
          (add-attr-to-nodes k v (nodes g))
          (add-attr-to-edges k v (edges g))))
-   g (partition 2 1 kvs)))
+   g (partition 2 kvs)))
 
 (defn hilite
   "Adds a red :color attribute to a node or edge"
