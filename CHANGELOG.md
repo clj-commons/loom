@@ -5,6 +5,9 @@
 **Bug fixes:**
 
 - `loom.dataflow/dataflow-analysis` could return before its worklist was empty. When a node's value stopped changing, the remaining queued nodes were dropped instead of processed, so cyclic graphs could come back missing definitions. Contributed by [Iain](https://github.com/NotAFlightRisk) (#159)
+- `loom.alg/bf-path` with start equal to end returned nil instead of a zero-hop path `[start]` (#161)
+- `loom.alg/johnson` returned distances offset by Bellman-Ford potentials; it now subtracts and adds the potentials to restore the original shortest-path distances (#161)
+- `loom.alg/astar-path` did not reopen closed nodes when a shorter path was found later, causing incorrect paths with inconsistent heuristics; nodes are now reopened when a shorter distance is discovered (#161)
 
 ## [1.2.1](https://github.com/clj-commons/loom/tree/1.2.1) (2026-09-20)
 
