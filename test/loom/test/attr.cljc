@@ -1,6 +1,6 @@
 (ns loom.test.attr
   (:require [loom.graph :refer (digraph)]
-            [loom.attr :refer (add-attr attr add-attr-to-nodes add-attr-to-edges)]
+            [loom.attr :refer (add-attr add-attrs-to-all attr add-attr-to-nodes add-attr-to-edges)]
             #?@(:clj [[clojure.test :refer [deftest is]]]))
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest is)])]))
 
@@ -29,3 +29,13 @@
     (is (= "edge from node 2" (attr lg2 2 4 :label)))
     (is (= "edge to node 5" (attr lg2 3 5 :label)))
     (is (= "edge to node 5" (attr lg2 4 5 :label)))))
+
+(deftest add-attrs-to-all-pairs-key-values
+  (let [g (-> (digraph [1 2])
+              (add-attrs-to-all :color :red :label "x"))]
+    (is (= :red (attr g 1 :color)))
+    (is (= "x" (attr g 1 :label)))
+    (is (= :red (attr g 1 2 :color)))
+    (is (= "x" (attr g 1 2 :label)))
+    (is (nil? (attr g 1 :red)))
+    (is (nil? (attr g 1 2 :red)))))
