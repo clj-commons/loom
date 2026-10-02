@@ -1,5 +1,11 @@
 # Change Log
 
+## [Unreleased]
+
+**Bug fixes:**
+
+- `loom.attr/remove-attr` on an undirected edge only cleared one direction, so the attribute could still be read from the other end and showed up in `dot-str` output. Both directions are now cleared, matching `add-attr`. Contributed by [Iain](https://github.com/NotAFlightRisk) (#165)
+
 ## [1.2.2](https://github.com/clj-commons/loom/tree/1.2.2) (2026-09-26)
 
 **Bug fixes:**

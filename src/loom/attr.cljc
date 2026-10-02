@@ -31,7 +31,10 @@ thickness, etc)."
                      (update-in g [:attrs node-or-edge] dissoc k)
                      (remove-attr g (src node-or-edge) (dest node-or-edge) k)))
                   ([g n1 n2 k]
-                   (update-in g [:attrs n1 ::edge-attrs n2] dissoc k)))
+                   (let [g (update-in g [:attrs n1 ::edge-attrs n2] dissoc k)
+                         g (if (directed? g) g
+                               (update-in g [:attrs n2 ::edge-attrs n1] dissoc k))]
+                     g)))
    :attr (fn
            ([g node-or-edge k]
             (if (has-node? g node-or-edge)
