@@ -140,7 +140,7 @@
   [data ext]
   (let [ext (name ext)
         ext (if (= \. (first ext)) ext (str \. ext))
-        tmp (java.io.File/createTempFile (subs ext 1) ext)]
+        tmp (java.io.File/createTempFile "loom-" ext)]
     (if (string? data)
       (with-open [w (java.io.FileWriter. tmp)]
         (.write w ^String data))
