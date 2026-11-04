@@ -1,5 +1,12 @@
 # Change Log
 
+## Unreleased
+
+**Bug fixes:**
+
+- `loom.io/view` with a two-letter format such as `{:fmt :ps}` threw `IllegalArgumentException` because the extension was used as the temp-file prefix, which must be at least three characters. Temp files now use a `loom-` prefix. Contributed by [metayan](https://github.com/metayan) (#168)
+- `loom.io/view` wrote the rendered graph to a temp file other local users could read. On POSIX systems the file is now readable and writable only by its owner (#168)
+
 ## [1.2.3](https://github.com/clj-commons/loom/tree/1.2.3) (2026-10-01)
 
 **Bug fixes:**

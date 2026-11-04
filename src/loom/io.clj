@@ -140,7 +140,11 @@
   [data ext]
   (let [ext (name ext)
         ext (if (= \. (first ext)) ext (str \. ext))
-        tmp (java.io.File/createTempFile "loom-" ext)]
+        ;; Files/createTempFile creates the file owner-only on POSIX systems,
+        ;; so other local users cannot read the rendered graph.
+        tmp (.toFile (java.nio.file.Files/createTempFile
+                      "loom-" ext
+                      (make-array java.nio.file.attribute.FileAttribute 0)))]
     (if (string? data)
       (with-open [w (java.io.FileWriter. tmp)]
         (.write w ^String data))
