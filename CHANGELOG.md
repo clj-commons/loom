@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## [1.2.4](https://github.com/clj-commons/loom/tree/1.2.4) (2026-11-04)
 
 **Bug fixes:**
 
