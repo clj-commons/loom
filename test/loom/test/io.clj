@@ -39,3 +39,41 @@
     (let [out (dot-str (graph [1 2]) :node {})]
       (is (not (re-find #"null" out)))
       (is (not (re-find #"(?m)^  node" out))))))
+
+(defn- open-data-file
+  "Runs loom.io/open-data with the viewer stubbed out and returns the temp file
+  it wrote."
+  [data ext]
+  (let [opened (atom nil)]
+    (with-redefs [loom.io/open (fn [f] (reset! opened f) nil)]
+      (#'loom.io/open-data data ext))
+    @opened))
+
+(deftest open-data-short-extension-test
+  (testing "a two-letter extension such as :ps no longer trips the temp-file prefix minimum"
+    (let [f (open-data-file "%!PS" :ps)]
+      (is (.exists f))
+      (is (str/starts-with? (.getName f) "loom-"))
+      (is (str/ends-with? (.getName f) ".ps"))
+      (is (= "%!PS" (slurp f)))))
+  (testing "bytes are written as-is and a leading dot in the extension is kept once"
+    (let [data (.getBytes "<svg/>" "UTF-8")
+          f (open-data-file data ".svg")]
+      (is (str/ends-with? (.getName f) ".svg"))
+      (is (not (str/ends-with? (.getName f) "..svg")))
+      (is (= (seq data) (seq (java.nio.file.Files/readAllBytes (.toPath f))))))))
+
+(deftest open-data-temp-file-is-owner-only-test
+  (testing "on POSIX file systems the rendered graph is readable only by its owner"
+    (when (.contains (.supportedFileAttributeViews (java.nio.file.FileSystems/getDefault)) "posix")
+      (let [f (open-data-file "data" :png)
+            perms (set (map str (java.nio.file.Files/getPosixFilePermissions
+                                 (.toPath f) (make-array java.nio.file.LinkOption 0))))]
+        (is (= #{"OWNER_READ" "OWNER_WRITE"} perms))))))
+
+(deftest open-data-rejects-path-in-extension-test
+  (testing "an extension carrying a path separator cannot place the file outside the temp directory"
+    (let [opened (atom nil)]
+      (with-redefs [loom.io/open (fn [f] (reset! opened f) nil)]
+        (is (thrown? Exception (#'loom.io/open-data "x" "/../../loom-escape"))))
+      (is (nil? @opened)))))
