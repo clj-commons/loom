@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+**Bug fixes:**
+
+- `loom.graph/remove-edges` removed the edge but kept its attributes, so they reappeared when the edge was added again. Edge attributes are now pruned for both directions on undirected graphs (#166)
+
 ## [1.2.4](https://github.com/clj-commons/loom/tree/1.2.4) (2026-11-04)
 
 **Bug fixes:**
