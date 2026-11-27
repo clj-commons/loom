@@ -1,5 +1,5 @@
 (ns loom.test.attr
-  (:require [loom.graph :refer (digraph graph)]
+  (:require [loom.graph :refer (add-edges digraph graph remove-edges)]
             [loom.attr :refer (add-attr add-attrs-to-all attr remove-attr add-attr-to-nodes add-attr-to-edges)]
             #?@(:clj [[clojure.test :refer [deftest is]]]))
   #?@(:cljs [(:require-macros [cljs.test :refer (deftest is)])]))
@@ -46,3 +46,24 @@
               (remove-attr 1 2 :label))]
     (is (nil? (attr g 1 2 :label)))
     (is (nil? (attr g 2 1 :label)))))
+
+(deftest remove-edges-prunes-edge-attrs
+  (let [g (-> (graph [1 2] [2 3])
+              (add-attr 1 2 :label "x")
+              (add-attr 2 3 :label "y")
+              (add-attr 1 :color :red)
+              (remove-edges [1 2])
+              (add-edges [1 2]))]
+    (is (nil? (attr g 1 2 :label)))
+    (is (nil? (attr g 2 1 :label)))
+    (is (= "y" (attr g 2 3 :label)))
+    (is (= :red (attr g 1 :color)))))
+
+(deftest remove-edges-prunes-edge-attrs-in-directed-graph
+  (let [g (-> (digraph [1 2] [2 1])
+              (add-attr 1 2 :label "x")
+              (add-attr 2 1 :label "y")
+              (remove-edges [1 2])
+              (add-edges [1 2]))]
+    (is (nil? (attr g 1 2 :label)))
+    (is (= "y" (attr g 2 1 :label)))))

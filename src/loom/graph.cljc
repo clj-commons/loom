@@ -118,6 +118,21 @@ on adjacency lists."
       (transient {})
       attrs))))
 
+(defn- prune-edge-attrs
+  "Drop the attribute entry for the edge n1 -> n2: its map under n1's
+  ::edge-attrs, plus n1's own entry when nothing else is left. The
+  ::loom.attr/edge-attrs key is named as a literal to avoid a cyclic require."
+  [attrs n1 n2]
+  (if-let [ea (get-in attrs [n1 :loom.attr/edge-attrs])]
+    (let [ea (dissoc ea n2)]
+      (if (seq ea)
+        (assoc-in attrs [n1 :loom.attr/edge-attrs] ea)
+        (let [amap (dissoc (get attrs n1) :loom.attr/edge-attrs)]
+          (if (seq amap)
+            (assoc attrs n1 amap)
+            (dissoc attrs n1)))))
+    attrs))
+
 (defn remove-nodes
   "Removes nodes from graph g"
   [g & nodes]
@@ -127,9 +142,20 @@ on adjacency lists."
       g)))
 
 (defn remove-edges
-  "Removes edges from graph g. Do not include weights"
+  "Removes edges from graph g. Do not include weights. Any attributes on the
+  removed edges are dropped as well."
   [g & edges]
-  (remove-edges* g edges))
+  (let [g (remove-edges* g edges)
+        undirected? (not (satisfies? Digraph g))]
+    (if (:attrs g)
+      (assoc g :attrs
+             (reduce
+              (fn [attrs [n1 n2]]
+                (cond-> (prune-edge-attrs attrs n1 n2)
+                  undirected? (prune-edge-attrs n2 n1)))
+              (:attrs g)
+              edges))
+      g)))
 
 ;;;
 ;;; Records for basic graphs -- one edge per vertex pair/direction,
